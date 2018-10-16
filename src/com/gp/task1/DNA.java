@@ -8,12 +8,11 @@ public class DNA{
     private int initrate;
 
     public DNA(int lenght){
-        generateRandomDNA(initrate);
+        generateRandomDNA(lenght);
         calculateFitness();
     }
 
     public DNA(int length, int initrate){
-//        System.out.println(length);
         this.initrate = initrate;
 
         generateRandomDNA(length, initrate);
@@ -38,6 +37,8 @@ public class DNA{
 
 
     public void generateRandomDNA(int length, int initrate){
+        this.initrate = initrate;
+
         generateRandomDNA(length);
 
         int onesMustHave = getOnesMustHaveDNA();
@@ -78,10 +79,6 @@ public class DNA{
      *************************************************/
     public void printDNA(){
         System.out.print("DNA = ");
-
-//        for(int i = 0; i < gene.length; i++){
-//            System.out.print(gene[i]);
-//        }
 
         System.out.println(Arrays.toString(this.gene));
     }

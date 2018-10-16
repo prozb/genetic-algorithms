@@ -2,7 +2,6 @@ package test.gp.task1;
 
 import com.gp.task1.DNA;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -17,10 +16,10 @@ public class DNATest {
         testDNA = new DNA(200, 5);
     }
 
-    @Before
-    public void setUp(){
-
-    }
+//    @Before
+//    public void setUp(){
+//
+//    }
 
     @Test
     public void getOnesMustHaveDNATest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -33,14 +32,11 @@ public class DNATest {
     }
 
     @Test
-    public void generateRandomDNATest_notFirstGeneration() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void generateRandomDNATest_notFirstGeneration(){
         int dnaLength = 200;
         DNA dna = new DNA(dnaLength);
 
-        Method generateRandomDNA = dna.getClass().getDeclaredMethod("generateRandomDNA", Integer.class);
-        generateRandomDNA.setAccessible(true);
-        generateRandomDNA.invoke(dna, 200);
-
+        dna.generateRandomDNA(200);
         int [] result = dna.getGene();
 
         Assert.assertNotNull(result);
@@ -48,21 +44,17 @@ public class DNATest {
     }
 
     @Test
-    public void generateRandomDNATest_firstGeneration() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void generateRandomDNATest_firstGeneration(){
         int dnaLength = 300;
         int initrate = 5;
         int countOfOnesMustBe = (int) (dnaLength * (initrate / 100.0));
+
         DNA dna = new DNA(dnaLength);
-        dna.printDNA();
         dna.generateRandomDNA(dnaLength, initrate);
-        dna.printDNA();
-//        Method generateRandomDNA = dna.getClass().getDeclaredMethod("generateRandomDNA", Integer.class, Integer.class);
-//        generateRandomDNA.setAccessible(true);
-//        generateRandomDNA.invoke(dna, dnaLength, initrate);
 
         int [] result = dna.getGene();
-//        dna.printDNA();
         int countOfOnes = 0;
+
         for(int i = 0; i < result.length; i++){
             if(result[i] == 1){
                 countOfOnes++;
