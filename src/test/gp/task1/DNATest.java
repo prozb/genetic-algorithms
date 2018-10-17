@@ -8,6 +8,12 @@ import org.junit.Test;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * Class tests DNA
+ *
+ * @author Pavlo Rozbytskyi
+ * @version 0.0.1
+ */
 public class DNATest {
     private static DNA testDNA;
 

@@ -2,6 +2,12 @@ package com.gp.task1;
 
 import java.util.Arrays;
 
+/**
+ * Class represents DNA
+ *
+ * @author Pavlo Rozbytskyi
+ * @version 0.0.1
+ */
 public class DNA{
     private int [] gene;
     private int fitness;
