@@ -80,10 +80,39 @@ public class DNA{
             gene[x] = 0;
         }
     }
+
+    /**
+     * ATTENTION!
+     * gene2 DNA will be always concatenated to the end of this (current gene)!!!
+     * please use this function careful
+     *
+     * Example:
+     * crossOverPoint = 4
+     * this gene  = [1001 0000]
+     *      gene2 = [0010 1111]
+     *
+     * offspring  = [1001 1111] => gene2 is in the end
+     *
+     * @param gene2
+     * @param crossOverPoint crossing over position
+     * @return returns the offspring
+     */
+    public DNA crossOverAnotherGene(DNA gene2, int crossOverPoint) {
+        DNA offspring = new DNA(gene.length);
+
+        for(int i = 0; i < gene.length; i++){
+            if(i < crossOverPoint){
+                offspring.getGene()[i] = gene[i];
+            }else{
+                offspring.getGene()[i] = gene2.getGene()[i];
+            }
+        }
+
+        return offspring;
+    }
+
     // returns number of ones, must be in new DNA in first generation
     private int getOnesMustHaveDNA(){
-//        System.out.println("rate: " + (int)((initrate / 100.0) * gene.length) + "\n");
-
         return (int)((initrate / 100.0) * gene.length);
     }
 

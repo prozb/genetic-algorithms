@@ -60,44 +60,24 @@ public class DNAPool {
         }
     }
 
-
-    //TODO: test this function
     /**
      * generates two new genes and saves this two on the next free position in new generation
      * @param gene1
      * @param gene2
      * @param positionInNewGeneration pointer to the next free place in new generation
      */
-//    public void crossOver(DNA [] gene1, DNA[] gene2, int positionInNewGeneration){
-//        int pos = (int)(Math.random() * gene1.length);
-//
-//        DNA [] nextGene1 = new DNA[gene1.length];
-//        DNA [] nextGene2 = new DNA[gene2.length];
-//
-//        for(int i = 0; i < gene1.length; i++){
-//            if(i < pos){
-//                nextGene1[i] = gene1[i];
-//            }else{
-//                nextGene1[i] = gene2[i];
-//            }
-//        }
-//
-//        for(int i = 0; i < gene2.length; i++){
-//            if(i < pos){
-//                nextGene2[i] = gene2[i];
-//            }else{
-//                nextGene2[i] = gene1[i];
-//            }
-//        }
-//
-//        newGeneration[positionInNewGeneration++] = nextGene1;
-//        newGeneration[positionInNewGeneration++] = nextGene2;
-//    }
+    public void crossOver(DNA gene1, DNA gene2, int positionInNewGeneration){
+        int pos           = (int)(Math.random() * geneLen);
+        boolean firstGene = true;
+
+        newGeneration[positionInNewGeneration++] = gene1.crossOverAnotherGene(gene2, pos);
+        newGeneration[positionInNewGeneration++] = gene2.crossOverAnotherGene(gene1, pos);
+    }
 
     public void processMutation() throws Exception {
         int mutationsCount = getMutationCount();
 
-        int testCount = 0; //TODO: comment out after test
+        int testCount = 0; //test purposes
 
         while (mutationsCount > 0){
             int x = (int)(Math.random() * geneCount);
@@ -106,9 +86,10 @@ public class DNAPool {
             generation[x].invertCellOfDNA(y);
 
             mutationsCount--;
-            testCount++; //TODO: comment out after test
+            testCount++; //test purposes
         }
 
+        //test purposes
         if(testCount != getMutationCount()){
             throw new Exception("check your loop counter!");
         }
