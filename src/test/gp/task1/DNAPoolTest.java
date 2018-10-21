@@ -71,4 +71,36 @@ public class DNAPoolTest {
 
         Assert.assertTrue(thrownException == 0);
     }
+
+    @Test
+    public void getBestTenDNAsTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method sortGeneration = pool.getClass().getDeclaredMethod("sortGeneration", DNA [].class);
+        sortGeneration.setAccessible(true);
+        Method getBestTenDNAs = pool.getClass().getDeclaredMethod("getBestTenDNAs", DNA [].class);
+        getBestTenDNAs.setAccessible(true);
+
+        DNA [] gen = new DNA[20];
+        int thrown = 0;
+
+        for(int i = 0; i < gen.length; i++){
+            gen[i] = new DNA(10);
+            gen[i].setFitness((int) (Math.random() * 10));
+        }
+
+        sortGeneration.invoke(pool, (Object) gen);
+        DNA [] bestTen = (DNA[]) getBestTenDNAs.invoke(pool, (Object) gen);
+
+        try {
+            for (int i = 0; i < gen.length - 10; i++) {
+                if (bestTen[0].getFitness() < gen[i].getFitness()) {
+                    throw new Exception();
+                }
+            }
+        }catch (Exception e){
+            thrown = 1;
+        }
+
+        Assert.assertTrue(bestTen.length == 10);
+        Assert.assertTrue(thrown != 1);
+    }
 }

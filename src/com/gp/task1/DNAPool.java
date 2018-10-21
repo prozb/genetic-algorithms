@@ -85,12 +85,14 @@ public class DNAPool {
         }
     }
 
-    // TODO: test this method
+    /**
+     * Method processes replication
+     */
     public void processReplication(){
         sortGeneration(newGeneration);
 
         if(replicationScheme == 1){
-            DNA [] bestTenDNAs = Arrays.copyOfRange(newGeneration, 0, 10);
+            DNA [] bestTenDNAs = getBestTenDNAs(newGeneration);
 
             for(int i = 0; i < geneCount; i++){
                 newGeneration[i % 10] = bestTenDNAs[i % 10];
@@ -98,12 +100,13 @@ public class DNAPool {
         }
     }
 
+    // getting best ten genes
+    private DNA [] getBestTenDNAs(DNA [] newGeneration){
+        return Arrays.copyOfRange(newGeneration, (newGeneration.length - 10), newGeneration.length);
+    }
 
-    //TODO: test sorting method
+    // sorting dnas by fitness in increasing order
     private void sortGeneration(DNA [] generation){
-        for(int i = 0; i < generation.length; i++){
-            System.out.println("fitness: " + generation[i].getFitness());
-        }
         Arrays.sort(generation, Comparator.comparingInt(DNA::getFitness));
     }
 
