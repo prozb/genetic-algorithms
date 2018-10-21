@@ -101,6 +101,9 @@ public class DNAPool {
 
     //TODO: test sorting method
     private void sortGeneration(DNA [] generation){
+        for(int i = 0; i < generation.length; i++){
+            System.out.println("fitness: " + generation[i].getFitness());
+        }
         Arrays.sort(generation, Comparator.comparingInt(DNA::getFitness));
     }
 

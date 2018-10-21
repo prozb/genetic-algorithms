@@ -1,5 +1,6 @@
 package test.gp.task1;
 
+import com.gp.task1.DNA;
 import com.gp.task1.DNAPool;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -7,6 +8,7 @@ import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class DNAPoolTest {
     private static DNAPool pool;
@@ -41,7 +43,32 @@ public class DNAPoolTest {
     }
 
     @Test
-    public void sortGenerationTest(){
+    public void sortGenerationTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method sortGeneration = pool.getClass().getDeclaredMethod("sortGeneration", DNA [].class);
+        sortGeneration.setAccessible(true);
 
+        int thrownException = 0;
+        DNA [] gen = new DNA[5];
+
+        for(int i = 0; i < gen.length; i++){
+            gen[i] = new DNA(10);
+            gen[i].setFitness((int) (Math.random() * 10));
+        }
+
+        sortGeneration.invoke(pool, (Object) gen);
+        int prevFitness = gen[0].getFitness();
+
+        try {
+            for (int i = 1; i < gen.length; i++) {
+                if (prevFitness > gen[i].getFitness()) {
+                    throw new Exception();
+                }
+                prevFitness = gen[i].getFitness();
+            }
+        }catch (Exception e){
+            thrownException = 1;
+        }
+
+        Assert.assertTrue(thrownException == 0);
     }
 }

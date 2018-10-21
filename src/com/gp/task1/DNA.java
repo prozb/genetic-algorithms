@@ -132,4 +132,8 @@ public class DNA{
     public int getFitness(){
         return this.fitness;
     }
+
+    public void setFitness(int fitness){
+        this.fitness = fitness;
+    }
 }
