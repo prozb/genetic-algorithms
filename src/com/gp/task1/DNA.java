@@ -30,10 +30,9 @@ public class DNA{
      *                  SETUP METHODS                *
      *************************************************/
     public void calculateFitness(){
+        fitness = 0;
         for(int i = 0; i < gene.length; i++){
-            if(gene[i] == 1){
-                fitness++;
-            }
+            fitness += gene[i];
         }
     }
 

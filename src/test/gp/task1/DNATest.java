@@ -80,6 +80,7 @@ public class DNATest {
     public void crossOverAnotherGeneTest(){
         int geneLength    = 20;
         int crossOverPos  = (int)(Math.random() * geneLength);
+//        int crossOverPos = geneLength / 2;
         int thrownExcept  = 0;
 
         DNA firstTestDNA  = new DNA(geneLength, 10);

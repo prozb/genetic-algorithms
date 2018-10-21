@@ -1,5 +1,6 @@
 package com.gp.task1;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -23,8 +24,9 @@ public class DNAPool {
     private DNA [] generation;
     //here will be stored next generation of genes
     private DNA [] newGeneration;
+    private DNA [] replicationGeneration;
 
-    private int recombinationRate;
+    private float recombinationRate;
     private int mutationRate;
     private int crossoverMethod;
     private int replicationScheme;
@@ -33,7 +35,7 @@ public class DNAPool {
 
     private boolean finished;
 
-    public DNAPool(int geneLen, int geneCnt, int recombinationRate, int mutationRate, int initRate,
+    public DNAPool(int geneLen, int geneCnt, float recombinationRate, int mutationRate, int initRate,
                    int crossoverMethod, int replicationScheme){
         this.crossoverMethod    = crossoverMethod;
         this.recombinationRate  = recombinationRate;
@@ -62,7 +64,6 @@ public class DNAPool {
         }
     }
 
-    //TODO: test this method
     public void processRecombination() throws Exception {
         int recombinationCount    = getRecombinationsCount();
         int recombinationHappened = 0; //Testing purposes
@@ -72,7 +73,7 @@ public class DNAPool {
             int firstRandomGenePos  = (int) (Math.random() * geneCount);
             int secondRandomGenePos = (int) (Math.random() * geneCount);
 
-            crossOver(generation[firstRandomGenePos], generation[secondRandomGenePos], posInNewGeneration);
+            crossOver(replicationGeneration[firstRandomGenePos], replicationGeneration[secondRandomGenePos], posInNewGeneration);
 
             posInNewGeneration++;
             posInNewGeneration++;
@@ -89,13 +90,14 @@ public class DNAPool {
      * Method processes replication
      */
     public void processReplication(){
-        sortGeneration(newGeneration);
+        replicationGeneration = Arrays.copyOfRange(generation, 0, generation.length);
+        sortGeneration(replicationGeneration);
 
         if(replicationScheme == 1){
-            DNA [] bestTenDNAs = getBestTenDNAs(newGeneration);
+            DNA [] bestTenDNAs = getBestTenDNAs(replicationGeneration);
 
             for(int i = 0; i < geneCount; i++){
-                newGeneration[i % 10] = bestTenDNAs[i % 10];
+                replicationGeneration[i % 10] = bestTenDNAs[i % 10];
             }
         }
     }
@@ -123,10 +125,13 @@ public class DNAPool {
      * @param positionInNewGeneration pointer to the next free place in new generation
      */
     public void crossOver(DNA gene1, DNA gene2, int positionInNewGeneration){
-        int pos           = (int)(Math.random() * geneLen);
+        if(crossoverMethod == 1) {
+            int pos = (int) (Math.random() * geneLen);
+//            int pos = geneLen / 2;
 
-        newGeneration[positionInNewGeneration++] = gene1.crossOverAnotherGene(gene2, pos);
-        newGeneration[positionInNewGeneration++] = gene2.crossOverAnotherGene(gene1, pos);
+            newGeneration[positionInNewGeneration++] = gene1.crossOverAnotherGene(gene2, pos);
+            newGeneration[positionInNewGeneration++] = gene2.crossOverAnotherGene(gene1, pos);
+        }
     }
 
     public void processMutation() throws Exception {
@@ -150,8 +155,14 @@ public class DNAPool {
         }
     }
 
+    public void switchToNextGeneration(){
+        generation = newGeneration;
+
+        recalculateFitnessOfGeneration(generation);
+    }
+
     private int getRecombinationsCount(){
-        return recombinationRate * geneCount;
+        return (int)recombinationRate * geneCount;
     }
 
     private int getMutationCount(){
