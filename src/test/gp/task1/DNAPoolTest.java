@@ -13,7 +13,7 @@ public class DNAPoolTest {
 
     @BeforeClass
     public static void setupStatic(){
-        pool = new DNAPool(200, 200, 10, 1,
+        pool = new DNAPool(200, 200, 1,
                 2, 5, 1, 1);
     }
 

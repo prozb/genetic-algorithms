@@ -9,7 +9,6 @@ public class DNAPool {
      * DNA Pool constructor
      * @param geneLen               length of one gene
      * @param geneCnt               count of genes in one generation
-     * @param maxGenerations        maximum number of generations
      * @param recombinationRate
      * @param mutationRate          mutation rate in percent
      * @param initRate              how much numbers in gene are set to 1
@@ -22,7 +21,6 @@ public class DNAPool {
     //here will be stored next generation of genes
     private DNA [] newGeneration;
 
-    private int maxGenerations;
     private int recombinationRate;
     private int mutationRate;
     private int crossoverMethod;
@@ -30,9 +28,10 @@ public class DNAPool {
     private int geneCount;
     private int geneLen;
 
-    public DNAPool(int geneLen, int geneCnt, int maxGenerations, int recombinationRate, int mutationRate, int initRate,
+    private boolean finished;
+
+    public DNAPool(int geneLen, int geneCnt, int recombinationRate, int mutationRate, int initRate,
                    int crossoverMethod, int replicationScheme){
-        this.maxGenerations     = maxGenerations;
         this.crossoverMethod    = crossoverMethod;
         this.recombinationRate  = recombinationRate;
         this.mutationRate       = mutationRate;
@@ -40,26 +39,25 @@ public class DNAPool {
         this.replicationScheme  = replicationScheme;
         this.geneCount          = geneCnt;
         this.geneLen            = geneLen;
+        this.finished           = false;
 
         this.generation         = new DNA[geneCnt];
         this.newGeneration      = new DNA[geneCnt];
 
         createDNAGeneration(generation, geneLen, initRate);
         createDNAGeneration(newGeneration, geneLen);
+
+        checkFitness();
     }
 
-    private void createDNAGeneration(DNA [] gen, int geneLen, int initRate){
-        for(int i = 0; i < gen.length; i++){
-            gen[i] = new DNA(geneLen, initRate);
+    private void checkFitness(){
+        for(int i = 0; i < generation.length; i++){
+            if(generation[i].getFitness() == generation[i].getGene().length){
+                this.finished = true;
+                break;
+            }
         }
     }
-
-    private  void createDNAGeneration(DNA [] gen, int geneLen){
-        for(int i = 0; i < gen.length; i++) {
-            gen[i] = new DNA(geneLen);
-        }
-    }
-
     /**
      * generates two new genes and saves this two on the next free position in new generation
      * @param gene1
@@ -98,5 +96,21 @@ public class DNAPool {
 
     private int getMutationCount(){
         return  (int)((mutationRate / 100.0) * geneLen * geneCount);
+    }
+
+    private void createDNAGeneration(DNA [] gen, int geneLen, int initRate){
+        for(int i = 0; i < gen.length; i++){
+            gen[i] = new DNA(geneLen, initRate);
+        }
+    }
+
+    private  void createDNAGeneration(DNA [] gen, int geneLen){
+        for(int i = 0; i < gen.length; i++) {
+            gen[i] = new DNA(geneLen);
+        }
+    }
+
+    public boolean isFinished() {
+        return finished;
     }
 }

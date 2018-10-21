@@ -11,15 +11,15 @@ import java.util.Arrays;
 public class DNA{
     private int [] gene;
     private int fitness;
-    private int initrate;
+    private int initRate;
 
-    public DNA(int lenght){
-        generateRandomDNA(lenght);
+    public DNA(int length){
+        generateRandomDNA(length);
         calculateFitness();
     }
 
     public DNA(int length, int initrate){
-        this.initrate = initrate;
+        this.initRate = initrate;
 
         generateRandomDNA(length, initrate);
         calculateFitness();
@@ -39,7 +39,7 @@ public class DNA{
 
 
     public void generateRandomDNA(int length, int initrate){
-        this.initrate = initrate;
+        this.initRate = initrate;
 
         generateRandomDNA(length);
 
@@ -113,7 +113,7 @@ public class DNA{
 
     // returns number of ones, must be in new DNA in first generation
     private int getOnesMustHaveDNA(){
-        return (int)((initrate / 100.0) * gene.length);
+        return (int)((initRate / 100.0) * gene.length);
     }
 
     /*************************************************
