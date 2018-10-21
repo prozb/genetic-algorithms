@@ -1,5 +1,8 @@
 package com.gp.task1;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 /**
  * @author Pavlo Rozbytskyi
  * @version 0.0.1
@@ -82,9 +85,28 @@ public class DNAPool {
         }
     }
 
-    private void recalculateFitnessOfNextGeneration(){
-        for(int i = 0; i < newGeneration.length; i++){
-            newGeneration[i].calculateFitness();
+    // TODO: test this method
+    public void processReplication(){
+        sortGeneration(newGeneration);
+
+        if(replicationScheme == 1){
+            DNA [] bestTenDNAs = Arrays.copyOfRange(newGeneration, 0, 10);
+
+            for(int i = 0; i < geneCount; i++){
+                newGeneration[i % 10] = bestTenDNAs[i % 10];
+            }
+        }
+    }
+
+
+    //TODO: test sorting method
+    private void sortGeneration(DNA [] generation){
+        Arrays.sort(generation, Comparator.comparingInt(DNA::getFitness));
+    }
+
+    private void recalculateFitnessOfGeneration(DNA [] generation){
+        for(int i = 0; i < generation.length; i++){
+            generation[i].calculateFitness();
         }
     }
 
@@ -96,7 +118,6 @@ public class DNAPool {
      */
     public void crossOver(DNA gene1, DNA gene2, int positionInNewGeneration){
         int pos           = (int)(Math.random() * geneLen);
-        boolean firstGene = true;
 
         newGeneration[positionInNewGeneration++] = gene1.crossOverAnotherGene(gene2, pos);
         newGeneration[positionInNewGeneration++] = gene2.crossOverAnotherGene(gene1, pos);
@@ -145,5 +166,9 @@ public class DNAPool {
 
     public boolean isFinished() {
         return finished;
+    }
+
+    public DNA [] getGeneration(){
+        return this.generation;
     }
 }

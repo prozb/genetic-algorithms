@@ -39,4 +39,9 @@ public class DNAPoolTest {
 
         Assert.assertFalse(thrown);
     }
+
+    @Test
+    public void sortGenerationTest(){
+
+    }
 }
