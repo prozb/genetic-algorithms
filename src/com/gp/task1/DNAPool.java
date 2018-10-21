@@ -58,6 +58,36 @@ public class DNAPool {
             }
         }
     }
+
+    //TODO: test this method
+    public void processRecombination() throws Exception {
+        int recombinationCount    = getRecombinationsCount();
+        int recombinationHappened = 0; //Testing purposes
+        int posInNewGeneration    = 0;
+
+        while (recombinationCount > 0){
+            int firstRandomGenePos  = (int) (Math.random() * geneCount);
+            int secondRandomGenePos = (int) (Math.random() * geneCount);
+
+            crossOver(generation[firstRandomGenePos], generation[secondRandomGenePos], posInNewGeneration);
+
+            posInNewGeneration++;
+            posInNewGeneration++;
+
+            recombinationHappened++;
+        }
+
+        if(recombinationHappened != getRecombinationsCount()) {
+            throw new Exception();
+        }
+    }
+
+    private void recalculateFitnessOfNextGeneration(){
+        for(int i = 0; i < newGeneration.length; i++){
+            newGeneration[i].calculateFitness();
+        }
+    }
+
     /**
      * generates two new genes and saves this two on the next free position in new generation
      * @param gene1
@@ -93,6 +123,9 @@ public class DNAPool {
         }
     }
 
+    private int getRecombinationsCount(){
+        return recombinationRate * geneCount;
+    }
 
     private int getMutationCount(){
         return  (int)((mutationRate / 100.0) * geneLen * geneCount);

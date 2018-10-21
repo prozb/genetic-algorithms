@@ -29,7 +29,7 @@ public class DNA{
     /*************************************************
      *                  SETUP METHODS                *
      *************************************************/
-    private void calculateFitness(){
+    public void calculateFitness(){
         for(int i = 0; i < gene.length; i++){
             if(gene[i] == 1){
                 fitness++;
