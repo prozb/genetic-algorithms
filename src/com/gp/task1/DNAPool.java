@@ -7,24 +7,28 @@ package com.gp.task1;
 public class DNAPool {
     /**
      * DNA Pool constructor
-     * @param geneLen
-     * @param geneCnt
-     * @param maxGenerations
+     * @param geneLen               length of one gene
+     * @param geneCnt               count of genes in one generation
+     * @param maxGenerations        maximum number of generations
      * @param recombinationRate
-     * @param mutationRate
-     * @param initRate
+     * @param mutationRate          mutation rate in percent
+     * @param initRate              how much numbers in gene are set to 1
      * @param crossoverMethod
      * @param replicationScheme
      */
 
-    private DNA [][] generation;
-    private DNA [][] newGeneration;
+    //current generation of dna's
+    private DNA [] generation;
+    //here will be stored next generation of genes
+    private DNA [] newGeneration;
 
     private int maxGenerations;
     private int recombinationRate;
     private int mutationRate;
     private int crossoverMethod;
     private int replicationScheme;
+    private int geneCount;
+    private int geneLen;
 
     public DNAPool(int geneLen, int geneCnt, int maxGenerations, int recombinationRate, int mutationRate, int initRate,
                    int crossoverMethod, int replicationScheme){
@@ -34,27 +38,25 @@ public class DNAPool {
         this.mutationRate       = mutationRate;
         this.crossoverMethod    = crossoverMethod;
         this.replicationScheme  = replicationScheme;
+        this.geneCount          = geneCnt;
+        this.geneLen            = geneLen;
 
-        this.generation         = new DNA[geneCnt][geneCnt];
-        this.newGeneration      = new DNA[geneCnt][geneCnt];
+        this.generation         = new DNA[geneCnt];
+        this.newGeneration      = new DNA[geneCnt];
 
         createDNAGeneration(generation, geneLen, initRate);
         createDNAGeneration(newGeneration, geneLen);
     }
 
-    private void createDNAGeneration(DNA [][] gen, int geneLen, int initRate){
+    private void createDNAGeneration(DNA [] gen, int geneLen, int initRate){
         for(int i = 0; i < gen.length; i++){
-            for(int j = 0; j < gen[0].length; j++){
-                gen[i][j] = new DNA(geneLen, initRate);
-            }
+            gen[i] = new DNA(geneLen, initRate);
         }
     }
 
-    private  void createDNAGeneration(DNA [][] gen, int geneLen){
+    private  void createDNAGeneration(DNA [] gen, int geneLen){
         for(int i = 0; i < gen.length; i++) {
-            for (int j = 0; j < gen[0].length; j++) {
-                gen[i][j] = new DNA(geneLen);
-            }
+            gen[i] = new DNA(geneLen);
         }
     }
 
@@ -66,29 +68,54 @@ public class DNAPool {
      * @param gene2
      * @param positionInNewGeneration pointer to the next free place in new generation
      */
-    public void crossOver(DNA [] gene1, DNA[] gene2, int positionInNewGeneration){
-        int pos = (int)(Math.random() * gene1.length);
+//    public void crossOver(DNA [] gene1, DNA[] gene2, int positionInNewGeneration){
+//        int pos = (int)(Math.random() * gene1.length);
+//
+//        DNA [] nextGene1 = new DNA[gene1.length];
+//        DNA [] nextGene2 = new DNA[gene2.length];
+//
+//        for(int i = 0; i < gene1.length; i++){
+//            if(i < pos){
+//                nextGene1[i] = gene1[i];
+//            }else{
+//                nextGene1[i] = gene2[i];
+//            }
+//        }
+//
+//        for(int i = 0; i < gene2.length; i++){
+//            if(i < pos){
+//                nextGene2[i] = gene2[i];
+//            }else{
+//                nextGene2[i] = gene1[i];
+//            }
+//        }
+//
+//        newGeneration[positionInNewGeneration++] = nextGene1;
+//        newGeneration[positionInNewGeneration++] = nextGene2;
+//    }
 
-        DNA [] nextGene1 = new DNA[gene1.length];
-        DNA [] nextGene2 = new DNA[gene2.length];
+    public void processMutation() throws Exception {
+        int mutationsCount = getMutationCount();
 
-        for(int i = 0; i < gene1.length; i++){
-            if(i < pos){
-                nextGene1[i] = gene1[i];
-            }else{
-                nextGene1[i] = gene2[i];
-            }
+        int testCount = 0; //TODO: comment out after test
+
+        while (mutationsCount > 0){
+            int x = (int)(Math.random() * geneCount);
+            int y = (int)(Math.random() * geneLen);
+
+            generation[x].invertCellOfDNA(y);
+
+            mutationsCount--;
+            testCount++; //TODO: comment out after test
         }
 
-        for(int i = 0; i < gene2.length; i++){
-            if(i < pos){
-                nextGene2[i] = gene2[i];
-            }else{
-                nextGene2[i] = gene1[i];
-            }
+        if(testCount != getMutationCount()){
+            throw new Exception("check your loop counter!");
         }
+    }
 
-        newGeneration[positionInNewGeneration++] = nextGene1;
-        newGeneration[positionInNewGeneration++] = nextGene2;
+
+    private int getMutationCount(){
+        return  (int)((mutationRate / 100.0) * geneLen * geneCount);
     }
 }

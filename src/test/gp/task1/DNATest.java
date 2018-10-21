@@ -2,6 +2,7 @@ package test.gp.task1;
 
 import com.gp.task1.DNA;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -15,17 +16,12 @@ import java.lang.reflect.Method;
  * @version 0.0.1
  */
 public class DNATest {
-    private static DNA testDNA;
+    private DNA testDNA;
 
-    @BeforeClass
-    public static void setUpStatic(){
-        testDNA = new DNA(200, 5);
+    @Before
+    public void setUpStatic(){
+        this.testDNA = new DNA(200, 5);
     }
-
-//    @Before
-//    public void setUp(){
-//
-//    }
 
     @Test
     public void getOnesMustHaveDNATest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -69,5 +65,15 @@ public class DNATest {
 
         Assert.assertNotNull(result);
         Assert.assertEquals(countOfOnes, countOfOnesMustBe);
+    }
+
+    @Test
+    public void invertCellOfDNATest(){
+        int posToTest  = (int)(Math.random() * testDNA.getGene().length);
+        int prevResult = testDNA.getGene()[posToTest];
+
+        testDNA.invertCellOfDNA(posToTest);
+
+        Assert.assertNotEquals(prevResult, testDNA.getGene()[posToTest]);
     }
 }

@@ -69,6 +69,17 @@ public class DNA{
         }
     }
 
+    /**
+     * Method inverts current cell value
+     * @param x position
+     */
+    public void invertCellOfDNA(int x){
+        if(gene[x] == 0){
+            gene[x] = 1;
+        }else{
+            gene[x] = 0;
+        }
+    }
     // returns number of ones, must be in new DNA in first generation
     private int getOnesMustHaveDNA(){
 //        System.out.println("rate: " + (int)((initrate / 100.0) * gene.length) + "\n");
