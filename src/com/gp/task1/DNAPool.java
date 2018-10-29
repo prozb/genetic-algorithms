@@ -32,6 +32,8 @@ public class DNAPool {
     private int geneCount;
     private int geneLen;
 
+    private static boolean SPEED_UP = true;
+
     private boolean finished;
 
     public DNAPool(int geneLen, int geneCnt, float recombinationRate, int mutationRate, int initRate,
@@ -66,27 +68,48 @@ public class DNAPool {
     }
 
     public void processRecombination() throws Exception {
-        int recombinationCount    = getRecombinationsCount();
-        int recombinationHappened = 0; //Testing purposes
-        int posInNewGeneration    = 0;
+        int recombinationCount;
+        int recombinationHappened;
+        int posInNewGeneration;
 
-        while (recombinationCount > 0){
-            int firstRandomGenePos  = (int) (Math.random() * geneCount);
-            int secondRandomGenePos = (int) (Math.random() * geneCount);
+        if(SPEED_UP){
+            recombinationCount = generation.length;
+            recombinationHappened = 0;
+            posInNewGeneration = 0;
 
-            crossOver(generation[firstRandomGenePos], generation[secondRandomGenePos], posInNewGeneration);
+            int firstGenePos = 0;
 
-            posInNewGeneration++;
-            posInNewGeneration++;
+            while (recombinationCount > 0){
+                int secondGenePos = (int)(Math.random() * geneCount);
 
-//            System.err.println("pos in new gen: " + posInNewGeneration);
-            recombinationCount--;
-            recombinationHappened++;
+                crossOver(generation[firstGenePos], generation[secondGenePos], posInNewGeneration);
+                firstGenePos++;
+                recombinationHappened++;
+                recombinationCount--;
+                posInNewGeneration++;
+            }
+        }else {
+            recombinationCount = getRecombinationsCount();
+            recombinationHappened = 0; //Testing purposes
+            posInNewGeneration = 0;
+
+            while (recombinationCount > 0) {
+                int firstRandomGenePos = (int) (Math.random() * geneCount);
+                int secondRandomGenePos = (int) (Math.random() * geneCount);
+
+                crossOver(generation[firstRandomGenePos], generation[secondRandomGenePos], posInNewGeneration);
+
+                posInNewGeneration++;
+                posInNewGeneration++;
+                recombinationCount--;
+                recombinationHappened++;
+            }
+
+            if(recombinationHappened != getRecombinationsCount()) {
+                throw new Exception();
+            }
         }
 
-        if(recombinationHappened != getRecombinationsCount()) {
-            throw new Exception();
-        }
     }
 
     /**
@@ -139,9 +162,22 @@ public class DNAPool {
 //            gene1.printDNA();
 //            gene2.printDNA();
 //            System.err.println("=====================");
+            if(SPEED_UP){
+                DNA firstGene  = gene1.crossOverAnotherGene(gene2, pos);
+                DNA secondGene = gene2.crossOverAnotherGene(gene1, pos);
 
-            newGeneration[positionInNewGeneration++] = gene1.crossOverAnotherGene(gene2, pos);
-            newGeneration[positionInNewGeneration++] = gene2.crossOverAnotherGene(gene1, pos);
+                firstGene.calculateFitness();
+                secondGene.calculateFitness();
+
+                if(firstGene.getFitness() > secondGene.getFitness()){
+                    newGeneration[positionInNewGeneration++] = firstGene;
+                }else {
+                    newGeneration[positionInNewGeneration++] = secondGene;
+                }
+            }else {
+                newGeneration[positionInNewGeneration++] = gene1.crossOverAnotherGene(gene2, pos);
+                newGeneration[positionInNewGeneration++] = gene2.crossOverAnotherGene(gene1, pos);
+            }
 
 //            System.err.println("genes crossed over pos " + pos +  " ");
 //            newGeneration[positionInNewGeneration - 2].printDNA();

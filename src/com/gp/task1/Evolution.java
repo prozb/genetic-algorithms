@@ -39,7 +39,7 @@ public class Evolution {
     private static void runGenerations() throws Exception {
         DNAPool dnaPool = new DNAPool(geneLength, geneCount, recombinationCountPercent,
                 mutationRate, initRate, crossoverMethod, replicationSchema);
-        int countOfGeneratios = 0;
+        int countOfGenerations = 0;
 
         while(!dnaPool.isFinished()) {
 //            dnaPool.printDNAPool();
@@ -52,11 +52,11 @@ public class Evolution {
 //            dnaPool.printDNAPool();
 //            System.out.println("gen count: " + countOfGeneratios + " best fitness: " + dnaPool.getGeneration()[0].getFitness());
             System.out.println("best fitness: " + dnaPool.getBestFitness());
-            countOfGeneratios++;
+            countOfGenerations++;
             Thread.sleep(100);
         }
 
-        System.out.println("count of generations: " + countOfGeneratios);
+        System.out.println("count of generations: " + countOfGenerations);
         //TODO: think about where to store data
     }
 }
