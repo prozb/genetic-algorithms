@@ -170,13 +170,20 @@ public class DNAPool {
                 secondGene.calculateFitness();
 
                 if(firstGene.getFitness() > secondGene.getFitness()){
+                    firstGene.mutateDNA(mutationRate / 100.0f);
                     newGeneration[positionInNewGeneration++] = firstGene;
                 }else {
+                    secondGene.mutateDNA(mutationRate / 100.0f);
                     newGeneration[positionInNewGeneration++] = secondGene;
                 }
             }else {
-                newGeneration[positionInNewGeneration++] = gene1.crossOverAnotherGene(gene2, pos);
-                newGeneration[positionInNewGeneration++] = gene2.crossOverAnotherGene(gene1, pos);
+                DNA firstGene  = gene1.crossOverAnotherGene(gene2, pos);
+                DNA secondGene = gene2.crossOverAnotherGene(gene1, pos);
+                firstGene.mutateDNA(mutationRate / 100.0f);
+                secondGene.mutateDNA(mutationRate / 100.0f);
+
+                newGeneration[positionInNewGeneration++] = firstGene;
+                newGeneration[positionInNewGeneration++] = secondGene;
             }
 
 //            System.err.println("genes crossed over pos " + pos +  " ");
@@ -187,23 +194,25 @@ public class DNAPool {
     }
 
     public void processMutation() throws Exception {
-        int mutationsCount = getMutationCount();
+        if(!SPEED_UP) {
+            int mutationsCount = getMutationCount();
 
-        int testCount = 0; //test purposes
+            int testCount = 0; //test purposes
 
-        while (mutationsCount > 0){
-            int x = (int)(Math.random() * geneCount);
-            int y = (int)(Math.random() * geneLen);
+            while (mutationsCount > 0) {
+                int x = (int) (Math.random() * geneCount);
+                int y = (int) (Math.random() * geneLen);
 
-            generation[x].invertCellOfDNA(y);
+                generation[x].invertCellOfDNA(y);
 
-            mutationsCount--;
-            testCount++; //test purposes
-        }
+                mutationsCount--;
+                testCount++; //test purposes
+            }
 
-        //test purposes
-        if(testCount != getMutationCount()){
-            throw new Exception("check your loop counter!");
+            //test purposes
+            if (testCount != getMutationCount()) {
+                throw new Exception("check your loop counter!");
+            }
         }
     }
 

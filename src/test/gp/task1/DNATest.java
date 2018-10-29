@@ -77,6 +77,12 @@ public class DNATest {
         Assert.assertNotEquals(prevResult, testDNA.getGene()[posToTest]);
     }
 
+//    @Test
+//    public void mutateDNATest(){
+//        DNA dna = new DNA(200, 5);
+//        dna.mutateDNA(0.01f);
+//    }
+
     @Test
     public void calculateFitnessTest(){
         int len     = 20;

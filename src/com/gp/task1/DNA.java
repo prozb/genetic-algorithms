@@ -113,6 +113,16 @@ public class DNA{
         return offspring;
     }
 
+    public void mutateDNA(float mutationRate){
+        int mutationNum = (int) (mutationRate * gene.length);
+//        System.err.println("mutation num: " + mutationNum);
+        while (mutationNum > 0){
+            int pos = (int)(Math.random() * gene.length);
+            invertCellOfDNA(pos);
+            mutationNum--;
+        }
+    }
+
     // returns number of ones, must be in new DNA in first generation
     private int getOnesMustHaveDNA(){
         return (int)((initRate / 100.0) * gene.length);

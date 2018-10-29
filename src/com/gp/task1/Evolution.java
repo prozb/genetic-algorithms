@@ -9,16 +9,19 @@ public class Evolution {
     private static int crossoverMethod;
     private static int replicationSchema;
     private static float recombinationCountPercent;
+    private static int bestFitness;
 
     public static void main(String[] args) throws Exception {
-        maxGenerations = 5;
+        maxGenerations = 10;
         initRate = 5;
         geneCount = 200;
         geneLength = 200;
-        mutationRate = 2;
+        mutationRate = 1;
         replicationSchema = 1;
         recombinationCountPercent = 0.5f;
         crossoverMethod = 1;
+
+        bestFitness = 0;
 
 //        processCommands();
         startSimulation();
@@ -41,22 +44,30 @@ public class Evolution {
                 mutationRate, initRate, crossoverMethod, replicationSchema);
         int countOfGenerations = 0;
 
-        while(!dnaPool.isFinished()) {
+        int generations = 100;
+        while(generations > 0) {
 //            dnaPool.printDNAPool();
 
-            dnaPool.processMutation();
+//            dnaPool.processMutation();
             dnaPool.processRecombination();
             dnaPool.processReplication();
             dnaPool.switchToNextGeneration();
 
 //            dnaPool.printDNAPool();
 //            System.out.println("gen count: " + countOfGeneratios + " best fitness: " + dnaPool.getGeneration()[0].getFitness());
-            System.out.println("best fitness: " + dnaPool.getBestFitness());
+//            System.out.println("best fitness: " + dnaPool.getBestFitness());
+
+            if(dnaPool.getBestFitness() > bestFitness){
+                bestFitness = dnaPool.getBestFitness();
+            }
+
+            generations--;
             countOfGenerations++;
-            Thread.sleep(100);
+//            Thread.sleep(100);
         }
 
         System.out.println("count of generations: " + countOfGenerations);
+        System.out.println("max fitness: " + bestFitness);
         //TODO: think about where to store data
     }
 }
