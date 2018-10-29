@@ -102,4 +102,21 @@ public class DNAPoolTest {
         Assert.assertTrue(bestTen.length == 10);
         Assert.assertTrue(thrown != 1);
     }
+
+    @Test
+    public void getBestFitnessTest(){
+        DNA [] dnas = new DNA[5];
+        int expected = (dnas.length - 1) * 2;
+
+        for(int i = 0; i < dnas.length; i++){
+            dnas[i] = new DNA(10);
+            dnas[i].setFitness(i * 2);
+        }
+
+        pool.setGeneration(dnas);
+
+        int result = pool.getBestFitness();
+
+        Assert.assertEquals(result, expected);
+    }
 }

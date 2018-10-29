@@ -14,6 +14,8 @@ public class DNA{
     private int initRate;
 
     public DNA(int length){
+        this.fitness = 0;
+
         generateRandomDNA(length);
         calculateFitness();
     }
@@ -23,6 +25,7 @@ public class DNA{
 
         generateRandomDNA(length, initrate);
         calculateFitness();
+        printDNA();
     }
 
 
@@ -30,9 +33,9 @@ public class DNA{
      *                  SETUP METHODS                *
      *************************************************/
     public void calculateFitness(){
-        fitness = 0;
+        this.fitness = 0;
         for(int i = 0; i < gene.length; i++){
-            fitness += gene[i];
+            this.fitness += gene[i];
         }
     }
 
@@ -119,9 +122,10 @@ public class DNA{
      *                  GETTERS/SETTERS              *
      *************************************************/
     public void printDNA(){
-        System.out.print("DNA = ");
+        calculateFitness();
 
-        System.out.println(Arrays.toString(this.gene));
+//        System.err.print("DNA fitness = " + this.fitness + " ");
+//        System.err.println(Arrays.toString(this.gene));
     }
 
     public int [] getGene(){
@@ -134,5 +138,9 @@ public class DNA{
 
     public void setFitness(int fitness){
         this.fitness = fitness;
+    }
+
+    public void setGene(int [] gene){
+        this.gene = gene;
     }
 }

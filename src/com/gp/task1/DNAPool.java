@@ -1,6 +1,5 @@
 package com.gp.task1;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -48,10 +47,12 @@ public class DNAPool {
 
         this.generation         = new DNA[geneCnt];
         this.newGeneration      = new DNA[geneCnt];
+        this.replicationGeneration = new DNA[geneCnt];
 
         createDNAGeneration(generation, geneLen, initRate);
-        createDNAGeneration(newGeneration, geneLen);
+//        createDNAGeneration(newGeneration, geneLen);
 
+        recalculateFitnessOfGeneration(generation);
         checkFitness();
     }
 
@@ -73,11 +74,13 @@ public class DNAPool {
             int firstRandomGenePos  = (int) (Math.random() * geneCount);
             int secondRandomGenePos = (int) (Math.random() * geneCount);
 
-            crossOver(replicationGeneration[firstRandomGenePos], replicationGeneration[secondRandomGenePos], posInNewGeneration);
+            crossOver(generation[firstRandomGenePos], generation[secondRandomGenePos], posInNewGeneration);
 
             posInNewGeneration++;
             posInNewGeneration++;
 
+//            System.err.println("pos in new gen: " + posInNewGeneration);
+            recombinationCount--;
             recombinationHappened++;
         }
 
@@ -90,14 +93,15 @@ public class DNAPool {
      * Method processes replication
      */
     public void processReplication(){
-        replicationGeneration = Arrays.copyOfRange(generation, 0, generation.length);
-        sortGeneration(replicationGeneration);
+        replicationGeneration = Arrays.copyOfRange(newGeneration, 0, generation.length);
 
         if(replicationScheme == 1){
+            sortGeneration(replicationGeneration);
+
             DNA [] bestTenDNAs = getBestTenDNAs(replicationGeneration);
 
             for(int i = 0; i < geneCount; i++){
-                replicationGeneration[i % 10] = bestTenDNAs[i % 10];
+                replicationGeneration[i] = bestTenDNAs[i % 10];
             }
         }
     }
@@ -109,6 +113,7 @@ public class DNAPool {
 
     // sorting dnas by fitness in increasing order
     private void sortGeneration(DNA [] generation){
+//        Arrays.sort(generation, Comparator.comparingInt(DNA::getFitness));
         Arrays.sort(generation, Comparator.comparingInt(DNA::getFitness));
     }
 
@@ -126,11 +131,22 @@ public class DNAPool {
      */
     public void crossOver(DNA gene1, DNA gene2, int positionInNewGeneration){
         if(crossoverMethod == 1) {
+            //newGeneration = Arrays.copyOfRange(generation, 0, generation.length);
+
             int pos = (int) (Math.random() * geneLen);
 //            int pos = geneLen / 2;
+//            System.err.println("genes to cross over pos " + pos +  " ");
+//            gene1.printDNA();
+//            gene2.printDNA();
+//            System.err.println("=====================");
 
             newGeneration[positionInNewGeneration++] = gene1.crossOverAnotherGene(gene2, pos);
             newGeneration[positionInNewGeneration++] = gene2.crossOverAnotherGene(gene1, pos);
+
+//            System.err.println("genes crossed over pos " + pos +  " ");
+//            newGeneration[positionInNewGeneration - 2].printDNA();
+//            newGeneration[positionInNewGeneration - 1].printDNA();
+//            System.err.println("=====================");
         }
     }
 
@@ -156,13 +172,13 @@ public class DNAPool {
     }
 
     public void switchToNextGeneration(){
+        newGeneration = replicationGeneration;
         generation = newGeneration;
-
         recalculateFitnessOfGeneration(generation);
     }
 
     private int getRecombinationsCount(){
-        return (int)recombinationRate * geneCount;
+        return (int)(recombinationRate * geneCount);
     }
 
     private int getMutationCount(){
@@ -175,11 +191,9 @@ public class DNAPool {
         }
     }
 
-    private  void createDNAGeneration(DNA [] gen, int geneLen){
-        for(int i = 0; i < gen.length; i++) {
-            gen[i] = new DNA(geneLen);
-        }
-    }
+//    private  void createDNAGeneration(DNA [] gen, int geneLen){
+//        gen = new DNA[geneLen];
+//    }
 
     public boolean isFinished() {
         return finished;
@@ -187,5 +201,28 @@ public class DNAPool {
 
     public DNA [] getGeneration(){
         return this.generation;
+    }
+
+    public void setGeneration(DNA [] generation){
+        this.generation = generation;
+    }
+    // TODO: testing purposes
+    public void printDNAPool(){
+        System.err.println("DNA pool: ");
+        for(int i = 0; i < generation.length; i++){
+            generation[i].printDNA();
+        }
+    }
+
+    public int getBestFitness(){
+        int best = 0;
+
+        for(int i = 0; i < generation.length; i++){
+            if(generation[i].getFitness() > best){
+                best = generation[i].getFitness();
+            }
+        }
+
+        return best;
     }
 }

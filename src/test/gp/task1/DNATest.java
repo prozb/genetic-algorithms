@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -76,6 +77,28 @@ public class DNATest {
         Assert.assertNotEquals(prevResult, testDNA.getGene()[posToTest]);
     }
 
+    @Test
+    public void calculateFitnessTest(){
+        int len     = 20;
+        int fitness = 0;
+
+        int [] gene = new int [len];
+
+        for(int i = 0; i < gene.length; i++){
+            if(i % 2 == 0){
+                gene[i] = 1;
+                fitness++;
+            }
+        }
+
+        DNA testDNA = new DNA(len);
+        testDNA.setGene(gene);
+        testDNA.calculateFitness();
+
+        int result = testDNA.getFitness();
+
+        Assert.assertTrue(result == fitness);
+    }
     @Test
     public void crossOverAnotherGeneTest(){
         int geneLength    = 20;

@@ -42,17 +42,21 @@ public class Evolution {
         int countOfGeneratios = 0;
 
         while(!dnaPool.isFinished()) {
+//            dnaPool.printDNAPool();
+
             dnaPool.processMutation();
-            dnaPool.processReplication();
             dnaPool.processRecombination();
+            dnaPool.processReplication();
             dnaPool.switchToNextGeneration();
 
-            System.err.println("gen count: " + countOfGeneratios + " best fitness: " + dnaPool.getGeneration()[0].getFitness());
+//            dnaPool.printDNAPool();
+//            System.out.println("gen count: " + countOfGeneratios + " best fitness: " + dnaPool.getGeneration()[0].getFitness());
+            System.out.println("best fitness: " + dnaPool.getBestFitness());
             countOfGeneratios++;
-//            Thread.sleep(100);
+            Thread.sleep(100);
         }
 
-        System.err.println("count of generations: " + countOfGeneratios);
+        System.out.println("count of generations: " + countOfGeneratios);
         //TODO: think about where to store data
     }
 }
