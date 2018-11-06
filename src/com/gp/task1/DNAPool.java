@@ -23,7 +23,6 @@ public class DNAPool {
     private DNA [] generation;
     //here will be stored next generation of genes
     private DNA [] newGeneration;
-    private DNA [] replicationGeneration;
 
     private float recombinationRate;
     private int mutationRate;
@@ -32,7 +31,7 @@ public class DNAPool {
     private int geneCount;
     private int geneLen;
 
-    private static boolean SPEED_UP = true;
+    private static boolean SPEED_UP = false;
 
     private boolean finished;
 
@@ -49,7 +48,6 @@ public class DNAPool {
 
         this.generation         = new DNA[geneCnt];
         this.newGeneration      = new DNA[geneCnt];
-        this.replicationGeneration = new DNA[geneCnt];
 
         createDNAGeneration(generation, geneLen, initRate);
 //        createDNAGeneration(newGeneration, geneLen);
@@ -60,7 +58,7 @@ public class DNAPool {
 
     private void checkFitness(){
         for(int i = 0; i < generation.length; i++){
-            if(generation[i].getFitness() == generation[i].getGene().length){
+            if(generation[i].getFitness() == geneLen){
                 this.finished = true;
                 break;
             }
@@ -99,8 +97,7 @@ public class DNAPool {
 
                 crossOver(generation[firstRandomGenePos], generation[secondRandomGenePos], posInNewGeneration);
 
-                posInNewGeneration++;
-                posInNewGeneration++;
+                posInNewGeneration += 2;
                 recombinationCount--;
                 recombinationHappened++;
             }
@@ -116,15 +113,13 @@ public class DNAPool {
      * Method processes replication
      */
     public void processReplication(){
-        replicationGeneration = Arrays.copyOfRange(newGeneration, 0, generation.length);
-
         if(replicationScheme == 1){
-            sortGeneration(replicationGeneration);
+            sortGeneration(newGeneration);
 
-            DNA [] bestTenDNAs = getBestTenDNAs(replicationGeneration);
+            DNA [] bestTenDNAs = getBestTenDNAs(newGeneration);
 
             for(int i = 0; i < geneCount; i++){
-                replicationGeneration[i] = bestTenDNAs[i % 10];
+                newGeneration[i] = bestTenDNAs[i % 10];
             }
         }
     }
@@ -170,20 +165,22 @@ public class DNAPool {
                 secondGene.calculateFitness();
 
                 if(firstGene.getFitness() > secondGene.getFitness()){
-                    firstGene.mutateDNA(mutationRate / 100.0f);
+//                    firstGene.mutateDNA(mutationRate / 100.0f);
                     newGeneration[positionInNewGeneration++] = firstGene;
                 }else {
-                    secondGene.mutateDNA(mutationRate / 100.0f);
+//                    secondGene.mutateDNA(mutationRate / 100.0f);
                     newGeneration[positionInNewGeneration++] = secondGene;
                 }
             }else {
                 DNA firstGene  = gene1.crossOverAnotherGene(gene2, pos);
                 DNA secondGene = gene2.crossOverAnotherGene(gene1, pos);
-                firstGene.mutateDNA(mutationRate / 100.0f);
-                secondGene.mutateDNA(mutationRate / 100.0f);
+//                firstGene.mutateDNA(mutationRate / 100.0f);
+//                secondGene.mutateDNA(mutationRate / 100.0f);
+                firstGene.calculateFitness();
+                secondGene.calculateFitness();
 
                 newGeneration[positionInNewGeneration++] = firstGene;
-                newGeneration[positionInNewGeneration++] = secondGene;
+                newGeneration[positionInNewGeneration] = secondGene;
             }
 
 //            System.err.println("genes crossed over pos " + pos +  " ");
@@ -217,7 +214,6 @@ public class DNAPool {
     }
 
     public void switchToNextGeneration(){
-        newGeneration = replicationGeneration;
         generation = newGeneration;
         recalculateFitnessOfGeneration(generation);
     }
@@ -269,5 +265,16 @@ public class DNAPool {
         }
 
         return best;
+    }
+
+    public int getSmallestFitness(){
+        int smallest = 0;
+
+        for(int i = 0; i < generation.length; i++){
+            if(generation[i].getFitness() < smallest){
+                smallest = generation[i].getFitness();
+            }
+        }
+        return smallest;
     }
 }

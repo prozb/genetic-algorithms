@@ -12,7 +12,7 @@ public class Evolution {
     private static int bestFitness;
 
     public static void main(String[] args) throws Exception {
-        maxGenerations = 10;
+        maxGenerations = 6;
         initRate = 5;
         geneCount = 200;
         geneLength = 200;
@@ -45,12 +45,13 @@ public class Evolution {
         int countOfGenerations = 0;
 
         int generations = 100;
-        while(generations > 0) {
+        while(generations > 0 && !dnaPool.isFinished()) {
 //            dnaPool.printDNAPool();
 
 //            dnaPool.processMutation();
             dnaPool.processRecombination();
             dnaPool.processReplication();
+            dnaPool.processMutation();
             dnaPool.switchToNextGeneration();
 
 //            dnaPool.printDNAPool();
