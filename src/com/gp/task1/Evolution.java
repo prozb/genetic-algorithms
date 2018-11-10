@@ -44,7 +44,7 @@ public class Evolution {
                 mutationRate, initRate, crossoverMethod, replicationSchema);
         int countOfGenerations = 0;
 
-        int generations = 100;
+        int generations = 300;
         while(generations > 0 && !dnaPool.isFinished()) {
 //            dnaPool.printDNAPool();
 
