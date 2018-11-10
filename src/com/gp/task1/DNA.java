@@ -1,156 +1,58 @@
 package com.gp.task1;
 
-import java.util.Arrays;
-
-/**
- * Class represents DNA
- *
- * @author Pavlo Rozbytskyi
- * @version 0.0.1
- */
 public class DNA{
+    private int len;
     private int [] gene;
-    private int fitness;
-    private int initRate;
 
-    public DNA(int length){
-        this.fitness = 0;
+    public DNA(int len, int initRate){
+        this.len = len;
 
-        generateRandomDNA(length);
-        calculateFitness();
+        initGene(initRate);
     }
 
-    public DNA(int length, int initrate){
-        this.initRate = initrate;
+    public DNA(int len){
+        initGene();
+    }
 
-        generateRandomDNA(length, initrate);
-        calculateFitness();
-        printDNA();
+    private void initGene(){
+        this.gene = new int [len];
     }
 
 
-    /*************************************************
-     *                  SETUP METHODS                *
-     *************************************************/
-    public void calculateFitness(){
-        this.fitness = 0;
-        for(int i = 0; i < gene.length; i++){
-            this.fitness += gene[i];
+    /**
+     *  initRate represents percent of all cells set on 1
+     * @param initRate integer represents percent
+     */
+    private void initGene(int initRate){
+        initGene();
+
+        int initCount = (int) ((initRate / 100.0) * len);
+        int randPos   = 0;
+
+        while(initCount > 0){
+            randPos = (int) (Math.random() * 200);
+
+            if(setCell(randPos))
+                initCount--;
         }
     }
 
-
-    public void generateRandomDNA(int length, int initrate){
-        this.initRate = initrate;
-
-        generateRandomDNA(length);
-
-        int onesMustHave = getOnesMustHaveDNA();
-        //print("onesMustHave: " + onesMustHave);
-
-        int countOfOnes = 0;
-        int pos = 0;
-
-        while(countOfOnes < onesMustHave){
-            pos = (int)(Math.random() * gene.length);
-            //println("rand: " + pos);
-
-            if(gene[pos] != 1){
+    // returns true if cell can be set
+    private boolean setCell(int pos){
+        try {
+            if(gene[pos] == 0){
                 gene[pos] = 1;
 
-                countOfOnes++;
-            }
-        }
-    }
-
-    public void generateRandomDNA(int length){
-        this.gene = new int [length];
-
-        for(int i = 0; i < gene.length; i++){
-            gene[i] = 0;
-        }
-    }
-
-    /**
-     * Method inverts current cell value
-     * @param x position
-     */
-    public void invertCellOfDNA(int x){
-        if(gene[x] == 0){
-            gene[x] = 1;
-        }else{
-            gene[x] = 0;
-        }
-    }
-
-    /**
-     * ATTENTION!
-     * gene2 DNA will be always concatenated to the end of this (current gene)!!!
-     * please use this function careful
-     *
-     * Example:
-     * crossOverPoint = 4
-     * this gene  = [1001 0000]
-     *      gene2 = [0010 1111]
-     *
-     * offspring  = [1001 1111] => gene2 is in the end
-     *
-     * @param gene2
-     * @param crossOverPoint crossing over position
-     * @return returns the offspring
-     */
-    public DNA crossOverAnotherGene(DNA gene2, int crossOverPoint) {
-        DNA offspring = new DNA(gene.length);
-
-        for(int i = 0; i < gene.length; i++){
-            if(i < crossOverPoint){
-                offspring.getGene()[i] = gene[i];
+                return true;
             }else{
-                offspring.getGene()[i] = gene2.getGene()[i];
+                return false;
             }
-        }
-
-        return offspring;
-    }
-
-    public void mutateDNA(float mutationRate){
-        int mutationNum = (int) (mutationRate * gene.length);
-//        System.err.println("mutation num: " + mutationNum);
-        while (mutationNum > 0){
-            int pos = (int)(Math.random() * gene.length);
-            invertCellOfDNA(pos);
-            mutationNum--;
+        }catch (ArrayIndexOutOfBoundsException e){
+            return false;
         }
     }
 
-    // returns number of ones, must be in new DNA in first generation
-    private int getOnesMustHaveDNA(){
-        return (int)((initRate / 100.0) * gene.length);
-    }
-
-    /*************************************************
-     *                  GETTERS/SETTERS              *
-     *************************************************/
-    public void printDNA(){
-        calculateFitness();
-
-//        System.err.print("DNA fitness = " + this.fitness + " ");
-//        System.err.println(Arrays.toString(this.gene));
-    }
-
-    public int [] getGene(){
-        return this.gene;
-    }
-
-    public int getFitness(){
-        return this.fitness;
-    }
-
-    public void setFitness(int fitness){
-        this.fitness = fitness;
-    }
-
-    public void setGene(int [] gene){
-        this.gene = gene;
+    public int[] getGene() {
+        return gene;
     }
 }
