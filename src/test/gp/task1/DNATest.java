@@ -27,4 +27,29 @@ public class DNATest {
         int occurrence1  = (int) Arrays.stream(geneArr1).filter(elem -> 1 == elem).count();
         Assert.assertEquals(0, occurrence1);
     }
+
+    @Test
+    public void calcFitnessTest(){
+        int len  = 200;
+        int init = 5;
+
+        DNA dna = new DNA(len, init);
+
+        int expected = (int)((init / 100.0) * len);
+        int fitness  = dna.getFitness();
+
+        Assert.assertEquals(expected, fitness);
+    }
+
+    @Test
+    public void calcEmptyFitnessTest(){
+        int len  = 200;
+
+        DNA dna = new DNA(len);
+
+        int expected = 0;
+        int fitness  = dna.getFitness();
+
+        Assert.assertEquals(expected, fitness);
+    }
 }
