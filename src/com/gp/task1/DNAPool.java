@@ -19,13 +19,16 @@ public class DNAPool{
     private int generationLen;
     private int geneLen;
     private float mutationRate;
+    private int replicationSchema;
 
     public DNAPool(){
 
     }
 
     // calculating fitness after each loop and after creating new generation
-    public DNAPool(int generationLen, int geneLen, int initRate, float mutationRate){
+    public DNAPool(int generationLen, int geneLen, int initRate, float mutationRate, int replicationSchema){
+        this.replicationSchema = replicationSchema;
+
         this.mutationRate  = mutationRate;
         this.generationLen = generationLen;
 
@@ -118,6 +121,32 @@ public class DNAPool{
 
         calcMaxFitnessOfGeneration();
         calcMinFitnessOfGeneration();
+    }
+
+    public void processReplication(){
+        switch(replicationSchema){
+            case 1:
+                replicationSchemaOne();
+                break;
+            default:
+                throw new RuntimeException("please input replication schema");
+        }
+    }
+
+    private void replicationSchemaOne(){
+        int selectionPercent = 10;
+
+        DNA [] bestDNAs = getBestGenes(selectionPercent);
+
+        for(int i = 0; i < currentGeneration.length; i++){
+            currentGeneration[i] = bestDNAs[i % 10];
+        }
+    }
+
+    public DNA [] getBestGenes(int selectionPercent){
+        int selectCount = (int) (selectionPercent / 100.0f * generationLen);
+
+        return Arrays.copyOfRange(currentGeneration, 0, selectCount);
     }
 
     public int getGenerationsCount(){

@@ -5,6 +5,7 @@ import com.gp.task1.DNAPool;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.security.spec.ECField;
 import java.util.Arrays;
 
 /**
@@ -18,7 +19,7 @@ public class DNAPoolTest {
         int geneLen       = 200;
         int initRate      = 5;
 
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0);
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0, 0);
 
         int expectedMax = 10;
         int actualMax   = pool.getMaxFitness();
@@ -32,7 +33,7 @@ public class DNAPoolTest {
         int geneLen       = 200;
         int initRate      = 5;
 
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0);
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0, 0);
         pool.switchToNextGeneration();
 
         int expectedNewFitn  = 0;
@@ -72,7 +73,7 @@ public class DNAPoolTest {
         boolean thrown     = false;
 
         try {
-            DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate);
+            DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, 0);
             pool.processMutation();
         }catch (Exception e){
             thrown = true;
@@ -89,7 +90,7 @@ public class DNAPoolTest {
         float mutationRate = 0.02f;
         boolean thrown     = false;
 
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate);
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, 0);
 
         pool.processMutation();
         pool.processMutation();
@@ -101,6 +102,60 @@ public class DNAPoolTest {
         try {
             for (int i = 1; i < pool.getGeneration().length; i++) {
                 if (pool.getGeneration()[i].getFitness() > pool.getGeneration()[i - 1].getFitness())
+                    throw new RuntimeException();
+            }
+        }catch (Exception e){
+            thrown = true;
+        }
+        Assert.assertFalse(thrown);
+    }
+
+    @Test
+    public void getBestGenesTest(){
+        int generationLen  = 200;
+        int geneLen        = 200;
+        int initRate       = 5;
+        float mutationRate = 0.02f;
+        int replicationSch = 1;
+
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, replicationSch);
+
+        pool.processMutation();
+        pool.processMutation();
+        pool.processMutation();
+        pool.processMutation();
+        pool.sortGeneration();
+
+        DNA [] bestTwenty = pool.getBestGenes(10);
+
+        Assert.assertEquals(20, bestTwenty.length);
+        Assert.assertTrue(bestTwenty[bestTwenty.length - 1].getFitness() >= pool.getGeneration()[bestTwenty.length].getFitness());
+    }
+
+    @Test
+    public void replicationSchemaOneTest(){
+        int generationLen  = 200;
+        int geneLen        = 200;
+        int initRate       = 5;
+        float mutationRate = 0.02f;
+        int replicationSch = 1;
+        boolean thrown     = false;
+
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, replicationSch);
+
+        pool.processMutation();
+        pool.processMutation();
+        pool.processMutation();
+        pool.processMutation();
+        pool.sortGeneration();
+
+        DNA [] bestGenes  = pool.getBestGenes(10);
+        pool.processReplication();
+        DNA [] generation = pool.getGeneration();
+
+        try{
+            for(int i = 0; i < generation.length; i++){
+                if(!generation[i].getFitness().equals(bestGenes[i % 10].getFitness()))
                     throw new RuntimeException();
             }
         }catch (Exception e){
