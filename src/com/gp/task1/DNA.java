@@ -20,6 +20,7 @@ public class DNA{
     }
 
     public DNA(int len){
+        this.len = len;
         this.fitness = 0;
         initGene();
     }
@@ -50,6 +51,9 @@ public class DNA{
         }
     }
 
+    public void invertCell(int pos){
+        gene[pos] = gene[pos] == 0 ? 1 : 0;
+    }
     // returns true if cell can be set
     private boolean setCell(int pos){
         try {

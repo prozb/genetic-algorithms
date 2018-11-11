@@ -18,7 +18,7 @@ public class DNAPoolTest {
         int geneLen       = 200;
         int initRate      = 5;
 
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate);
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0);
 
         int expectedMax = 10;
         int actualMax   = pool.getMaxFitness();
@@ -32,7 +32,7 @@ public class DNAPoolTest {
         int geneLen       = 200;
         int initRate      = 5;
 
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate);
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0);
         pool.switchToNextGeneration();
 
         int expectedNewFitn  = 0;
@@ -61,5 +61,23 @@ public class DNAPoolTest {
 
         Assert.assertArrayEquals(part1, Arrays.copyOfRange(gene, 0, pos));
         Assert.assertArrayEquals(part2, Arrays.copyOfRange(gene, pos, dna2.getGene().length));
+    }
+
+    @Test
+    public void processMutationTest(){
+        int generationLen  = 200;
+        int geneLen        = 200;
+        int initRate       = 5;
+        float mutationRate = 0.02f;
+        boolean thrown     = false;
+
+        try {
+            DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate);
+            pool.processMutation();
+        }catch (Exception e){
+            thrown = true;
+        }
+
+        Assert.assertFalse(thrown);
     }
 }

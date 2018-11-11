@@ -16,14 +16,19 @@ public class DNAPool{
     private int maxFitness;
     private int minFitness;
     private int generationsCount;
+    private int generationLen;
     private int geneLen;
+    private float mutationRate;
 
     public DNAPool(){
 
     }
 
     // calculating fitness after each loop and after creating new generation
-    public DNAPool(int generationLen, int geneLen, int initRate){
+    public DNAPool(int generationLen, int geneLen, int initRate, float mutationRate){
+        this.mutationRate  = mutationRate;
+        this.generationLen = generationLen;
+
         createGenerations(generationLen, geneLen, initRate);
     }
 
@@ -83,6 +88,29 @@ public class DNAPool{
 
         newDna.setGene(newGene);
         return newDna;
+    }
+
+    public void processMutation(){
+        int mutationCount     = (int) (mutationRate * geneLen * generationLen);
+        int mutationPerformed = 0;
+
+        int randGen = 0;
+        int randPos = 0;
+
+        do{
+            randGen = (int) (Math.random() * generationLen);
+            randPos = (int) (Math.random() * geneLen);
+
+            currentGeneration[randGen].invertCell(randPos);
+
+            mutationCount--;
+            mutationPerformed++;
+        }while (mutationCount > 0);
+
+        // testing reasons
+        if((int) (mutationRate * geneLen * generationLen) != mutationPerformed){
+            throw new RuntimeException();
+        }
     }
 
     public int getGenerationsCount(){

@@ -56,4 +56,19 @@ public class DNATest {
 
         Assert.assertEquals(expected, fitness);
     }
+
+    @Test
+    public void invertCell(){
+        int len = 200;
+
+        DNA dna = new DNA(len);
+
+        int pos  = (int) (Math.random() * dna.getGene().length);
+        int prev = dna.getGene()[pos];
+
+        dna.invertCell(pos);
+        int actual = dna.getGene()[pos];
+
+        Assert.assertNotEquals(prev, actual);
+    }
 }
