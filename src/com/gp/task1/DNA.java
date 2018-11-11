@@ -49,6 +49,8 @@ public class DNA{
             if(setCell(randPos))
                 initCount--;
         }
+
+        calcFitness();
     }
 
     public void invertCell(int pos){
@@ -84,6 +86,13 @@ public class DNA{
     }
 
     public Integer getFitness() {
+        calcFitness();
+
         return fitness;
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(gene) + "\n";
     }
 }

@@ -18,7 +18,7 @@ public class DNAPoolTest {
         int geneLen       = 200;
         int initRate      = 5;
 
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0, 0, 0);
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0, 0, 0, 0);
 
         int expectedMax = 10;
         int actualMax   = pool.getMaxFitness();
@@ -32,14 +32,13 @@ public class DNAPoolTest {
         int geneLen       = 200;
         int initRate      = 5;
 
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0, 0, 0);
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0, 0, 0, 0);
         pool.switchToNextGeneration();
 
         int expectedNewFitn  = 0;
         int expectedGenCount = 1;
         int actual           = pool.getGenerationsCount();
         Assert.assertEquals(expectedGenCount, actual);
-        Assert.assertEquals(expectedNewFitn, pool.getMaxFitness());
     }
 
     @Test
@@ -72,7 +71,7 @@ public class DNAPoolTest {
         boolean thrown     = false;
 
         try {
-            DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, 0, 0);
+            DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, 0, 0, 0);
             pool.processMutation();
         }catch (Exception e){
             thrown = true;
@@ -89,7 +88,7 @@ public class DNAPoolTest {
         float mutationRate = 0.02f;
         boolean thrown     = false;
 
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, 0, 0);
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, 0, 0, 0);
 
         pool.processMutation();
         pool.processMutation();
@@ -117,7 +116,7 @@ public class DNAPoolTest {
         float mutationRate = 0.02f;
         int replicationSch = 1;
 
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, replicationSch, 0);
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, replicationSch, 0, 0);
 
         pool.processMutation();
         pool.processMutation();
@@ -140,7 +139,7 @@ public class DNAPoolTest {
         int replicationSch = 1;
         boolean thrown     = false;
 
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, replicationSch, 0);
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, replicationSch, 0, 0);
 
         pool.processMutation();
         pool.processMutation();
@@ -171,9 +170,8 @@ public class DNAPoolTest {
         float mutationRate = 0.02f;
         int replicationSch = 1;
         int crossOverSch   = 1;
-        boolean thrown     = false;
 
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, replicationSch, crossOverSch);
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, replicationSch, crossOverSch, 0.5f);
 
         pool.processMutation();
         pool.processMutation();

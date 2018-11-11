@@ -12,24 +12,26 @@ import java.util.Optional;
 // figure out maximal and minimal fitness
 public class DNAPool{
     private DNA [] currentGeneration;
-    private DNA [] nextGeneration;
     private int maxFitness;
     private int minFitness;
     private int generationsCount;
     private int generationLen;
     private int geneLen;
     private float mutationRate;
+    private float recombinationRate;
     private int replicationSchema;
     private int crossOverSchema;
+    private boolean finished;
 
     public DNAPool(){
 
     }
 
     // calculating fitness after each loop and after creating new generation
-    public DNAPool(int generationLen, int geneLen, int initRate, float mutationRate, int replicationSchema, int crossOverSchema){
+    public DNAPool(int generationLen, int geneLen, int initRate, float mutationRate, int replicationSchema, int crossOverSchema, float recombinationRate){
         this.replicationSchema = replicationSchema;
         this.crossOverSchema   = crossOverSchema;
+        this.recombinationRate = recombinationRate;
 
         this.mutationRate  = mutationRate;
         this.generationLen = generationLen;
@@ -39,13 +41,11 @@ public class DNAPool{
 
     private void createGenerations(int generationLen, int geneLen, int initRate){
         this.currentGeneration = new DNA[generationLen];
-        this.nextGeneration    = new DNA[generationLen];
         this.geneLen           = geneLen;
         this.generationsCount  = 0;
 
         for(int i = 0; i < currentGeneration.length; i++){
             currentGeneration[i] = new DNA(geneLen, initRate);
-            nextGeneration[i]    = new DNA(geneLen);
         }
 
         calcMaxFitnessOfGeneration();
@@ -58,6 +58,11 @@ public class DNAPool{
     public void calcMaxFitnessOfGeneration(){
         Optional<DNA> dnaMaxFitness = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::getFitness));
         dnaMaxFitness.ifPresent(dna -> maxFitness = dna.getFitness());
+
+        if(maxFitness == geneLen) {
+            finished = true;
+            printInfo();
+        }
     }
 
     /**
@@ -69,9 +74,6 @@ public class DNAPool{
     }
 
     public void switchToNextGeneration(){
-        currentGeneration = nextGeneration;
-        Arrays.fill(nextGeneration, new DNA(geneLen));
-
         calcMinFitnessOfGeneration();
         calcMaxFitnessOfGeneration();
         generationsCount++;
@@ -92,7 +94,7 @@ public class DNAPool{
     }
 
     public void crossOverSchemaOne(){
-        int crossOverCount = currentGeneration.length / 2;
+        int crossOverCount = (int) (recombinationRate * generationLen);
         int crossOverPerf  = 0;
         int firstGenePos   = 0;
         int secondGenePos  = 0;
@@ -101,6 +103,7 @@ public class DNAPool{
 
         do {
             firstGenePos  = (int) (Math.random() * generationLen);
+            secondGenePos = (int) (Math.random() * generationLen);
             secondGenePos = (int) (Math.random() * generationLen);
 
             randPos = (int) (Math.random() * geneLen);
@@ -115,7 +118,7 @@ public class DNAPool{
             crossOverPerf++;
         }while (crossOverCount > 0);
 
-        assert currentGeneration.length / 2 == crossOverPerf;
+        assert (int)(currentGeneration.length * recombinationRate) == crossOverPerf;
     }
 
     public DNA crossOver(DNA dna1, DNA dna2, int randPos){
@@ -134,7 +137,7 @@ public class DNAPool{
     }
 
     public void processMutation(){
-        int mutationCount     = (int) (mutationRate * geneLen * generationLen);
+        int mutationCount     = (int) (mutationRate * geneLen * generationLen) + 1;
         int mutationPerformed = 0;
 
         int randGen = 0;
@@ -151,7 +154,7 @@ public class DNAPool{
         }while (mutationCount > 0);
 
         // testing reasons
-        if((int) (mutationRate * geneLen * generationLen) != mutationPerformed){
+        if((int) (mutationRate * geneLen * generationLen) != --mutationPerformed){
             throw new RuntimeException();
         }
 
@@ -160,6 +163,7 @@ public class DNAPool{
     }
 
     public void processReplication(){
+//        sortGeneration();
         switch(replicationSchema){
             case 1:
                 replicationSchemaOne();
@@ -178,14 +182,14 @@ public class DNAPool{
         DNA [] bestDNAs = getBestGenes(selectionPercent);
 
         for(int i = 0; i < currentGeneration.length; i++){
-            currentGeneration[i] = bestDNAs[i % 10];
+            currentGeneration[i] = bestDNAs[i / 10];
         }
     }
 
     public DNA [] getBestGenes(int selectionPercent){
         int selectCount = (int) (selectionPercent / 100.0f * generationLen);
 
-        return Arrays.copyOfRange(currentGeneration, 0, selectCount);
+        return Arrays.copyOfRange(currentGeneration, currentGeneration.length - selectCount, currentGeneration.length);
     }
 
     public int getGenerationsCount(){
@@ -202,5 +206,20 @@ public class DNAPool{
 
     public DNA [] getGeneration(){
         return currentGeneration;
+    }
+
+    public boolean isFinished(){
+        return finished;
+    }
+
+    public void printInfo(){
+        System.out.println("max fitness: " + maxFitness + " min fitness: " + minFitness +
+                " gen number: " + generationsCount + " \n=========================================================");
+    }
+
+    public void printGeneration(){
+        System.out.println("---------------------------------------------------------");
+        System.out.println(Arrays.toString(currentGeneration));
+        System.out.println("---------------------------------------------------------");
     }
 }
