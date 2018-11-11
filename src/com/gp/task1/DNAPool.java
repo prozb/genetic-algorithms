@@ -20,14 +20,16 @@ public class DNAPool{
     private int geneLen;
     private float mutationRate;
     private int replicationSchema;
+    private int crossOverSchema;
 
     public DNAPool(){
 
     }
 
     // calculating fitness after each loop and after creating new generation
-    public DNAPool(int generationLen, int geneLen, int initRate, float mutationRate, int replicationSchema){
+    public DNAPool(int generationLen, int geneLen, int initRate, float mutationRate, int replicationSchema, int crossOverSchema){
         this.replicationSchema = replicationSchema;
+        this.crossOverSchema   = crossOverSchema;
 
         this.mutationRate  = mutationRate;
         this.generationLen = generationLen;
@@ -76,10 +78,44 @@ public class DNAPool{
     }
 
     // created for testing reasons
-    public DNA processCrossOver(DNA dna1, DNA dna2){
-        int randPos        = (int) (Math.random() * 200);
+    public void processCrossOver(){
+        switch(crossOverSchema){
+            case 1:
+                crossOverSchemaOne();
+                break;
+            default:
+                throw new RuntimeException("please input replication schema");
+        }
 
-        return crossOver(dna1, dna2, randPos);
+        calcMinFitnessOfGeneration();
+        calcMaxFitnessOfGeneration();
+    }
+
+    public void crossOverSchemaOne(){
+        int crossOverCount = currentGeneration.length / 2;
+        int crossOverPerf  = 0;
+        int firstGenePos   = 0;
+        int secondGenePos  = 0;
+
+        int randPos = 0;
+
+        do {
+            firstGenePos  = (int) (Math.random() * generationLen);
+            secondGenePos = (int) (Math.random() * generationLen);
+
+            randPos = (int) (Math.random() * geneLen);
+
+            DNA dna1 = crossOver(currentGeneration[firstGenePos], currentGeneration[secondGenePos], randPos);
+            DNA dna2 = crossOver(currentGeneration[secondGenePos], currentGeneration[firstGenePos], randPos);
+
+            currentGeneration[firstGenePos]  = dna1;
+            currentGeneration[secondGenePos] = dna2;
+
+            crossOverCount--;
+            crossOverPerf++;
+        }while (crossOverCount > 0);
+
+        assert currentGeneration.length / 2 == crossOverPerf;
     }
 
     public DNA crossOver(DNA dna1, DNA dna2, int randPos){
@@ -131,6 +167,9 @@ public class DNAPool{
             default:
                 throw new RuntimeException("please input replication schema");
         }
+
+        calcMinFitnessOfGeneration();
+        calcMaxFitnessOfGeneration();
     }
 
     private void replicationSchemaOne(){
