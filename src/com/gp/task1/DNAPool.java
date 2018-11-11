@@ -90,6 +90,10 @@ public class DNAPool{
         return newDna;
     }
 
+    public void sortGeneration(){
+        Arrays.sort(currentGeneration, Comparator.comparing(DNA::getFitness));
+    }
+
     public void processMutation(){
         int mutationCount     = (int) (mutationRate * geneLen * generationLen);
         int mutationPerformed = 0;
@@ -111,6 +115,9 @@ public class DNAPool{
         if((int) (mutationRate * geneLen * generationLen) != mutationPerformed){
             throw new RuntimeException();
         }
+
+        calcMaxFitnessOfGeneration();
+        calcMinFitnessOfGeneration();
     }
 
     public int getGenerationsCount(){
@@ -123,5 +130,9 @@ public class DNAPool{
 
     public int getMinFitness() {
         return minFitness;
+    }
+
+    public DNA [] getGeneration(){
+        return currentGeneration;
     }
 }

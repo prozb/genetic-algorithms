@@ -80,4 +80,32 @@ public class DNAPoolTest {
 
         Assert.assertFalse(thrown);
     }
+
+    @Test
+    public void sortGenerationTest(){
+        int generationLen  = 200;
+        int geneLen        = 200;
+        int initRate       = 5;
+        float mutationRate = 0.02f;
+        boolean thrown     = false;
+
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate);
+
+        pool.processMutation();
+        pool.processMutation();
+        pool.processMutation();
+        pool.processMutation();
+
+        pool.sortGeneration();
+
+        try {
+            for (int i = 1; i < pool.getGeneration().length; i++) {
+                if (pool.getGeneration()[i].getFitness() > pool.getGeneration()[i - 1].getFitness())
+                    throw new RuntimeException();
+            }
+        }catch (Exception e){
+            thrown = true;
+        }
+        Assert.assertFalse(thrown);
+    }
 }
