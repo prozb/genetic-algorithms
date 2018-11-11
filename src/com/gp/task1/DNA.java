@@ -4,9 +4,10 @@ import java.util.Arrays;
 
 public class DNA{
     private int len;
-    private int fitness;
-    private int [] gene;
+    private Integer fitness;
+    private Integer [] gene;
 
+    // fitness will be calculated after creating gene
     public DNA(int len, int initRate){
         this.len = len;
 
@@ -19,10 +20,11 @@ public class DNA{
     }
 
     private void initGene(){
-        this.gene = new int [len];
+        this.gene = new Integer[len];
+        Arrays.fill(gene, 0);
     }
 
-    private void calcFitness(){
+    public void calcFitness(){
         this.fitness = (int) Arrays.stream(gene).filter(elem -> 1 == elem).count();
     }
     /**
@@ -58,11 +60,11 @@ public class DNA{
         }
     }
 
-    public int[] getGene() {
+    public Integer[] getGene() {
         return gene;
     }
 
-    public int getFitness() {
+    public Integer getFitness() {
         return fitness;
     }
 }
