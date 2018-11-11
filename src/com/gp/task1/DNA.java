@@ -16,6 +16,7 @@ public class DNA{
     }
 
     public DNA(int len){
+        this.fitness = 0;
         initGene();
     }
 
