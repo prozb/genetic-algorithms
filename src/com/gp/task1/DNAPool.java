@@ -4,9 +4,12 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
 
+/**
+ * @author Pavlo Rozbytskyi
+ * @version 2.0.0
+ */
 // after each generation loop you must recalculate fitness off all dna's and
 // figure out maximal and minimal fitness
-
 public class DNAPool{
     private DNA [] currentGeneration;
     private DNA [] nextGeneration;
@@ -63,12 +66,34 @@ public class DNAPool{
         calcMaxFitnessOfGeneration();
         generationsCount++;
     }
-    
+
+    // created for testing reasons
+    public DNA processCrossOver(DNA dna1, DNA dna2){
+        int randPos        = (int) (Math.random() * 200);
+
+        return crossOver(dna1, dna2, randPos);
+    }
+
+    public DNA crossOver(DNA dna1, DNA dna2, int randPos){
+        DNA newDna         = new DNA(dna1.getGene().length);
+        Integer [] newGene = new Integer[dna1.getGene().length];
+
+        System.arraycopy(dna1.getGene(), 0, newGene, 0, randPos);
+        System.arraycopy(dna2.getGene(), randPos, newGene, randPos, dna1.getGene().length - randPos);
+
+        newDna.setGene(newGene);
+        return newDna;
+    }
+
     public int getGenerationsCount(){
         return generationsCount;
     }
 
     public int getMaxFitness(){
         return maxFitness;
+    }
+
+    public int getMinFitness() {
+        return minFitness;
     }
 }

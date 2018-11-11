@@ -2,6 +2,10 @@ package com.gp.task1;
 
 import java.util.Arrays;
 
+/**
+ * @author Pavlo Rozbytskyi
+ * @version 2.0.0
+ */
 public class DNA{
     private int len;
     private Integer fitness;
@@ -59,6 +63,16 @@ public class DNA{
         }catch (ArrayIndexOutOfBoundsException e){
             return false;
         }
+    }
+
+    /**
+     * sets gene and recalculates fitness
+     * @param gene gene must be set
+     */
+    public void setGene(Integer [] gene){
+        this.gene = gene;
+
+        calcFitness();
     }
 
     public Integer[] getGene() {

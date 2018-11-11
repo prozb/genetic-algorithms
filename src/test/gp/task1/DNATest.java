@@ -6,6 +6,10 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+/**
+ * @author Pavlo Rozbytskyi
+ * @version 2.0.0
+ */
 public class DNATest {
     @Test
     public void initGeneTest(){
