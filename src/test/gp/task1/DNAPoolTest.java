@@ -241,4 +241,21 @@ public class DNAPoolTest {
 
         Assert.assertArrayEquals(beforeMutation, afterMutation);
     }
+
+    @Test
+    public void getBestGenePosTest(){
+        int generationLen  = 200;
+        int geneLen        = 200;
+        int initRate       = 5;
+        float mutationRate = 0.02f;
+
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, 0, 0, 0, false);
+
+        int expected = (int) (Math.random() * pool.getGeneration().length);
+        pool.getGeneration()[expected].setBest();
+
+        int result = pool.getBestGenePos();
+
+        Assert.assertEquals(result, expected);
+    }
 }
