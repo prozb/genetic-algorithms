@@ -59,6 +59,10 @@ public class DNA {
         this.best = true;
     }
 
+    public void unsetBest(){
+        this.best = false;
+    }
+
     public boolean isBest(){
         return best;
     }
@@ -99,10 +103,6 @@ public class DNA {
         calcFitness();
 
         return fitness;
-    }
-
-    public void setFitness(Integer fitness){
-        this.fitness = fitness;
     }
 
     @Override

@@ -180,4 +180,43 @@ public class DNAPoolTest {
         pool.processMutation();
         pool.processCrossOver();
     }
+
+    @Test
+    public void setBestGeneTest(){
+        int generationLen = 200;
+        int geneLen       = 200;
+        int initRate      = 5;
+        int bestGenePos   = 10;
+
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0, 0, 0, 0, false);
+
+        Integer [] bestArr = new Integer[geneLen];
+        Arrays.fill(bestArr, 1);
+        pool.getGeneration()[bestGenePos].setGene(bestArr);
+        pool.setBestGene();
+
+        boolean set = pool.getGeneration()[bestGenePos].isBest();
+
+        Assert.assertTrue(set);
+    }
+
+    @Test
+    public void unsetBestGene(){
+        int generationLen = 200;
+        int geneLen       = 200;
+        int initRate      = 5;
+        int bestGenePos   = 10;
+
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0, 0, 0, 0, false);
+
+        Integer [] bestArr = new Integer[geneLen];
+        Arrays.fill(bestArr, 1);
+        pool.getGeneration()[bestGenePos].setGene(bestArr);
+        pool.setBestGene();
+        pool.unsetBestGene();
+
+        boolean unSet = pool.getGeneration()[bestGenePos].isBest();
+
+        Assert.assertFalse(unSet);
+    }
 }

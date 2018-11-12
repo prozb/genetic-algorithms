@@ -84,6 +84,7 @@ public class DNAPool {
 
     // created for testing reasons
     public void processCrossOver(){
+        setBestGene();
         switch(crossOverSchema){
             case 1:
                 crossOverSchemaOne();
@@ -91,7 +92,7 @@ public class DNAPool {
             default:
                 throw new RuntimeException("please input replication schema");
         }
-
+        unsetBestGene();
         calcMinFitnessOfGeneration();
         calcMaxFitnessOfGeneration();
     }
@@ -102,23 +103,30 @@ public class DNAPool {
         int firstGenePos   = 0;
         int secondGenePos  = 0;
 
+        Optional<DNA> bestOpt = Arrays.stream(currentGeneration).filter(DNA::isBest).findFirst();
+        int bestPos = 0;
+        if(bestOpt.isPresent()) {
+            bestPos = Arrays.asList(currentGeneration).indexOf(bestOpt.get());
+        }
+
         int randPos = 0;
 
         do {
             firstGenePos  = (int) (Math.random() * generationLen);
             secondGenePos = (int) (Math.random() * generationLen);
-            secondGenePos = (int) (Math.random() * generationLen);
 
-            randPos = (int) (Math.random() * geneLen);
+            if(!(firstGenePos == bestPos || secondGenePos == bestPos)){
+                randPos = (int) (Math.random() * geneLen);
 
-            DNA DNA1 = crossOver(currentGeneration[firstGenePos], currentGeneration[secondGenePos], randPos);
-            DNA DNA2 = crossOver(currentGeneration[secondGenePos], currentGeneration[firstGenePos], randPos);
+                DNA DNA1 = crossOver(currentGeneration[firstGenePos], currentGeneration[secondGenePos], randPos);
+                DNA DNA2 = crossOver(currentGeneration[secondGenePos], currentGeneration[firstGenePos], randPos);
 
-            currentGeneration[firstGenePos]  = DNA1;
-            currentGeneration[secondGenePos] = DNA2;
+                currentGeneration[firstGenePos] = DNA1;
+                currentGeneration[secondGenePos] = DNA2;
 
-            crossOverCount--;
-            crossOverPerf++;
+                crossOverCount--;
+                crossOverPerf++;
+            }
         }while (crossOverCount > 0);
 
         assert (int)(currentGeneration.length * recombinationRate) == crossOverPerf;
@@ -229,5 +237,10 @@ public class DNAPool {
     public void setBestGene(){
         Optional<DNA> bestGene = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::getFitness));
         bestGene.ifPresent(DNA::setBest);
+    }
+
+    public void unsetBestGene(){
+        Optional<DNA> bestGene = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::isBest));
+        bestGene.ifPresent(DNA::unsetBest);
     }
 }

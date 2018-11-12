@@ -134,7 +134,6 @@ public class Main {
                                     replicationSchema, crossOverSchema, recombinationRate, protect);
         while(!pool.isFinished() && runsCount > 0){
             pool.processCrossOver();
-            pool.sortGeneration();
             pool.processMutation();
             pool.sortGeneration();
             pool.processReplication();

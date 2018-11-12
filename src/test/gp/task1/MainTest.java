@@ -33,23 +33,4 @@ public class MainTest {
         Assert.assertEquals(value, stringValue2);
         Assert.assertEquals(value, stringValue3);
     }
-
-    @Test
-    public void setBestGeneTest(){
-        int generationLen = 200;
-        int geneLen       = 200;
-        int initRate      = 5;
-        int bestGenePos   = 10;
-
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0, 0, 0, 0, false);
-
-        Integer [] bestArr = new Integer[geneLen];
-        Arrays.fill(bestArr, 1);
-        pool.getGeneration()[bestGenePos].setGene(bestArr);
-        pool.setBestGene();
-
-        boolean set = pool.getGeneration()[bestGenePos].isBest();
-
-        Assert.assertTrue(set);
-    }
 }
