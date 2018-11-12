@@ -6,7 +6,7 @@ import java.util.Arrays;
  * @author Pavlo Rozbytskyi
  * @version 2.0.0
  */
-public class DNA{
+public class DNA {
     private int len;
     private Integer fitness;
     private Integer [] gene;

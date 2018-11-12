@@ -7,8 +7,10 @@ import java.util.Optional;
  * @author Pavlo Rozbytskyi
  * @version 2.0.0
  */
-public class Simulation {
-    private static int NUM_OF_ARGS = 8;
+
+public class Main {
+    private static int NUM_OF_ARGS = 9;
+    private static int RUNS_COUNT  = 100;
 
     private static String [] arguments;
     private static int generationCount;
@@ -17,29 +19,33 @@ public class Simulation {
     private static int crossOverSchema;
     private static int maxGenerations;
     private static int initRate;
+    private static int runsNum;
     private static float mutationRate;
     private static float recombinationRate;
 
-    private static int averageRuns;
+    private static int [] statArr;
+    private static int resPosition = 0;
 
+    // TESTING PARAMETERS: --pm=0.02 --pc=0.5 --genecount=200 --genelen=200 --maxgen=1000 --runs=10 --initrate=5 --crossover_scheme=1 --replication_scheme=1
     public static void main(String[] args) throws InterruptedException {
         arguments = args;
 
-        processUserInput(args);
+        processUserInput();
         startSimulation();
+        showStatistics();
     }
 
-    private static void processUserInput(String [] args){
-        if(args.length <= 1){
+    private static void processUserInput(){
+        if(arguments.length <= 1){
             printHelpMessage();
             printError("No parameters!");
-        }else if(args[1].equals("--help")){
+        }else if(arguments[1].equals("--help")){
             printHelpMessage();
             System.exit(99);
-        }else if(args.length < NUM_OF_ARGS){
+        }else if(arguments.length < NUM_OF_ARGS){
             printHelpMessage();
             printError("Not enough parameters!");
-        }else if(args.length > NUM_OF_ARGS){
+        }else if(arguments.length > NUM_OF_ARGS){
             printHelpMessage();
             printError("To many parameters!");
         }else {
@@ -49,8 +55,11 @@ public class Simulation {
             replicationSchema = (int) getValue("--replication_scheme");
             initRate          = (int) getValue("--initrate");
             maxGenerations    = (int) getValue("--maxgen");
+            runsNum           = (int) getValue("--runs");
             mutationRate      = getValue("--pm");
-            recombinationRate = getValue("pc");
+            recombinationRate = getValue("--pc");
+
+            statArr = new int [runsNum];
         }
     }
 
@@ -88,10 +97,17 @@ public class Simulation {
                 "[--genelen] length of the gene (integer number)\n" +
                 "[--crossover_scheme] (integer number)\n" +
                 "[--replication_scheme] (integer number)\n" +
-                "[--maxgen] maximum generations (integer number)");
+                "[--maxgen] maximum generations (integer number)\n" +
+                "[--runs] number of runs (integer number)");
     }
 
     private static void startSimulation() throws InterruptedException {
+        while (runsNum > 0){
+            run();
+            runsNum--;
+        }
+    }
+    private static void run() {
 
         int runsCount = maxGenerations;
 
@@ -103,9 +119,22 @@ public class Simulation {
             pool.sortGeneration();
             pool.processReplication();
             pool.switchToNextGeneration();
-            pool.printInfo();
+//            pool.printInfo();
 
             runsCount--;
         }
+        push(pool.getGenerationsCount() - 1);
+    }
+
+    private static void showStatistics(){
+        int count     = Arrays.stream(statArr).sum();
+        float average = count / statArr.length;
+        System.out.printf("\n==================================================\n" +
+                "to achieve complete fitness, you need average %.4f generations", average);
+    }
+
+    // pushes result of the generation into statistics array
+    private static void push(int res){
+        statArr[resPosition++] = res;
     }
 }

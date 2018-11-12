@@ -49,17 +49,17 @@ public class DNAPoolTest {
         int len  = 200;
         int init = 5;
 
-        DNA dna1 = new DNA(len, init);
-        DNA dna2 = new DNA(len, init);
+        DNA DNA1 = new DNA(len, init);
+        DNA DNA2 = new DNA(len, init);
 
-        DNA newDna = pool.crossOver(dna1, dna2, pos);
+        DNA newDNA = pool.crossOver(DNA1, DNA2, pos);
 
-        Integer [] gene  = newDna.getGene();
-        Integer [] part1 = Arrays.copyOfRange(dna1.getGene(), 0, pos);
-        Integer [] part2 = Arrays.copyOfRange(dna2.getGene(), pos, dna2.getGene().length);
+        Integer [] gene  = newDNA.getGene();
+        Integer [] part1 = Arrays.copyOfRange(DNA1.getGene(), 0, pos);
+        Integer [] part2 = Arrays.copyOfRange(DNA2.getGene(), pos, DNA2.getGene().length);
 
         Assert.assertArrayEquals(part1, Arrays.copyOfRange(gene, 0, pos));
-        Assert.assertArrayEquals(part2, Arrays.copyOfRange(gene, pos, dna2.getGene().length));
+        Assert.assertArrayEquals(part2, Arrays.copyOfRange(gene, pos, DNA2.getGene().length));
     }
 
     @Test
@@ -98,8 +98,9 @@ public class DNAPoolTest {
         pool.sortGeneration();
 
         try {
-            for (int i = 1; i < pool.getGeneration().length; i++) {
-                if (pool.getGeneration()[i].getFitness() > pool.getGeneration()[i - 1].getFitness())
+//            for (int i = 1; i < pool.getGeneration().length; i++) {
+            for (int i = pool.getGeneration().length; i > 1; i++) {
+                if (pool.getGeneration()[i].getFitness() < pool.getGeneration()[i - 1].getFitness())
                     throw new RuntimeException();
             }
         }catch (Exception e){
@@ -124,7 +125,7 @@ public class DNAPoolTest {
         pool.processMutation();
         pool.sortGeneration();
 
-        DNA [] bestTwenty = pool.getBestGenes(10);
+        DNA[] bestTwenty = pool.getBestGenes(10);
 
         Assert.assertEquals(20, bestTwenty.length);
         Assert.assertTrue(bestTwenty[bestTwenty.length - 1].getFitness() >= pool.getGeneration()[bestTwenty.length].getFitness());
@@ -147,9 +148,9 @@ public class DNAPoolTest {
         pool.processMutation();
         pool.sortGeneration();
 
-        DNA [] bestGenes  = pool.getBestGenes(10);
+        DNA[] bestGenes  = pool.getBestGenes(10);
         pool.processReplication();
-        DNA [] generation = pool.getGeneration();
+        DNA[] generation = pool.getGeneration();
 
         try{
             for(int i = 0; i < generation.length; i++){

@@ -37,10 +37,10 @@ public class DNATest {
         int len  = 200;
         int init = 5;
 
-        DNA dna = new DNA(len, init);
+        DNA DNA = new DNA(len, init);
 
         int expected = (int)((init / 100.0) * len);
-        int fitness  = dna.getFitness();
+        int fitness  = DNA.getFitness();
 
         Assert.assertEquals(expected, fitness);
     }
@@ -49,10 +49,10 @@ public class DNATest {
     public void calcEmptyFitnessTest(){
         int len  = 200;
 
-        DNA dna = new DNA(len);
+        DNA DNA = new DNA(len);
 
         int expected = 0;
-        int fitness  = dna.getFitness();
+        int fitness  = DNA.getFitness();
 
         Assert.assertEquals(expected, fitness);
     }
@@ -61,13 +61,13 @@ public class DNATest {
     public void invertCell(){
         int len = 200;
 
-        DNA dna = new DNA(len);
+        DNA DNA = new DNA(len);
 
-        int pos  = (int) (Math.random() * dna.getGene().length);
-        int prev = dna.getGene()[pos];
+        int pos  = (int) (Math.random() * DNA.getGene().length);
+        int prev = DNA.getGene()[pos];
 
-        dna.invertCell(pos);
-        int actual = dna.getGene()[pos];
+        DNA.invertCell(pos);
+        int actual = DNA.getGene()[pos];
 
         Assert.assertNotEquals(prev, actual);
     }

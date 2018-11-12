@@ -10,8 +10,8 @@ import java.util.Optional;
  */
 // after each generation loop you must recalculate fitness off all dna's and
 // figure out maximal and minimal fitness
-public class DNAPool{
-    private DNA [] currentGeneration;
+public class DNAPool {
+    private DNA[] currentGeneration;
     private int maxFitness;
     private int minFitness;
     private int generationsCount;
@@ -57,7 +57,7 @@ public class DNAPool{
      */
     public void calcMaxFitnessOfGeneration(){
         Optional<DNA> dnaMaxFitness = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::getFitness));
-        dnaMaxFitness.ifPresent(dna -> maxFitness = dna.getFitness());
+        dnaMaxFitness.ifPresent(DNA -> maxFitness = DNA.getFitness());
 
         if(maxFitness == geneLen) {
             finished = true;
@@ -70,7 +70,7 @@ public class DNAPool{
      */
     public void calcMinFitnessOfGeneration(){
         Optional<DNA> dnaMinFitness = Arrays.stream(currentGeneration).min(Comparator.comparing(DNA::getFitness));
-        dnaMinFitness.ifPresent(dna -> minFitness = dna.getFitness());
+        dnaMinFitness.ifPresent(DNA -> minFitness = DNA.getFitness());
     }
 
     public void switchToNextGeneration(){
@@ -108,11 +108,11 @@ public class DNAPool{
 
             randPos = (int) (Math.random() * geneLen);
 
-            DNA dna1 = crossOver(currentGeneration[firstGenePos], currentGeneration[secondGenePos], randPos);
-            DNA dna2 = crossOver(currentGeneration[secondGenePos], currentGeneration[firstGenePos], randPos);
+            DNA DNA1 = crossOver(currentGeneration[firstGenePos], currentGeneration[secondGenePos], randPos);
+            DNA DNA2 = crossOver(currentGeneration[secondGenePos], currentGeneration[firstGenePos], randPos);
 
-            currentGeneration[firstGenePos]  = dna1;
-            currentGeneration[secondGenePos] = dna2;
+            currentGeneration[firstGenePos]  = DNA1;
+            currentGeneration[secondGenePos] = DNA2;
 
             crossOverCount--;
             crossOverPerf++;
@@ -121,15 +121,15 @@ public class DNAPool{
         assert (int)(currentGeneration.length * recombinationRate) == crossOverPerf;
     }
 
-    public DNA crossOver(DNA dna1, DNA dna2, int randPos){
-        DNA newDna         = new DNA(dna1.getGene().length);
-        Integer [] newGene = new Integer[dna1.getGene().length];
+    public DNA crossOver(DNA DNA1, DNA DNA2, int randPos){
+        DNA newDNA = new DNA(DNA1.getGene().length);
+        Integer [] newGene = new Integer[DNA1.getGene().length];
 
-        System.arraycopy(dna1.getGene(), 0, newGene, 0, randPos);
-        System.arraycopy(dna2.getGene(), randPos, newGene, randPos, dna1.getGene().length - randPos);
+        System.arraycopy(DNA1.getGene(), 0, newGene, 0, randPos);
+        System.arraycopy(DNA2.getGene(), randPos, newGene, randPos, DNA1.getGene().length - randPos);
 
-        newDna.setGene(newGene);
-        return newDna;
+        newDNA.setGene(newGene);
+        return newDNA;
     }
 
     public void sortGeneration(){
@@ -179,14 +179,14 @@ public class DNAPool{
     private void replicationSchemaOne(){
         int selectionPercent = 10;
 
-        DNA [] bestDNAs = getBestGenes(selectionPercent);
+        DNA[] bestDNAS = getBestGenes(selectionPercent);
 
         for(int i = 0; i < currentGeneration.length; i++){
-            currentGeneration[i] = bestDNAs[i / 10];
+            currentGeneration[i] = bestDNAS[i / 10];
         }
     }
 
-    public DNA [] getBestGenes(int selectionPercent){
+    public DNA[] getBestGenes(int selectionPercent){
         int selectCount = (int) (selectionPercent / 100.0f * generationLen);
 
         return Arrays.copyOfRange(currentGeneration, currentGeneration.length - selectCount, currentGeneration.length);
@@ -204,7 +204,7 @@ public class DNAPool{
         return minFitness;
     }
 
-    public DNA [] getGeneration(){
+    public DNA[] getGeneration(){
         return currentGeneration;
     }
 
@@ -214,7 +214,7 @@ public class DNAPool{
 
     public void printInfo(){
         System.out.println("max fitness: " + maxFitness + " min fitness: " + minFitness +
-                " gen number: " + generationsCount + " \n=========================================================");
+                " gen number: " + generationsCount + " \n---------------------------------------------------");
     }
 
     public void printGeneration(){
