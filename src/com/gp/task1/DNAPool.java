@@ -1,5 +1,6 @@
 package com.gp.task1;
 
+import javax.lang.model.type.ArrayType;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
@@ -22,6 +23,7 @@ public class DNAPool {
     private int replicationSchema;
     private int crossOverSchema;
     private boolean finished;
+    private boolean protect;
 
     public DNAPool(){
 
@@ -35,6 +37,7 @@ public class DNAPool {
 
         this.mutationRate  = mutationRate;
         this.generationLen = generationLen;
+        this.protect       = protect; // protecting best gene from mutation and cross over
 
         createGenerations(generationLen, geneLen, initRate);
     }
@@ -221,5 +224,10 @@ public class DNAPool {
         System.out.println("---------------------------------------------------------");
         System.out.println(Arrays.toString(currentGeneration));
         System.out.println("---------------------------------------------------------");
+    }
+
+    public void setBestGene(){
+        Optional<DNA> bestGene = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::getFitness));
+        bestGene.ifPresent(DNA::setBest);
     }
 }

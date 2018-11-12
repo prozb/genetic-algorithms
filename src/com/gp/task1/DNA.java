@@ -10,6 +10,7 @@ public class DNA {
     private int len;
     private Integer fitness;
     private Integer [] gene;
+    private boolean best;
 
     // fitness will be calculated after creating gene
     public DNA(int len, int initRate){
@@ -53,6 +54,15 @@ public class DNA {
         calcFitness();
     }
 
+    // please unset best gene after each generation
+    public void setBest(){
+        this.best = true;
+    }
+
+    public boolean isBest(){
+        return best;
+    }
+
     public void invertCell(int pos){
         gene[pos] = gene[pos] == 0 ? 1 : 0;
     }
@@ -91,8 +101,13 @@ public class DNA {
         return fitness;
     }
 
+    public void setFitness(Integer fitness){
+        this.fitness = fitness;
+    }
+
     @Override
     public String toString() {
         return Arrays.toString(gene) + "\n";
     }
+
 }
