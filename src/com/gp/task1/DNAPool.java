@@ -28,7 +28,7 @@ public class DNAPool {
     }
 
     // calculating fitness after each loop and after creating new generation
-    public DNAPool(int generationLen, int geneLen, int initRate, float mutationRate, int replicationSchema, int crossOverSchema, float recombinationRate){
+    public DNAPool(int generationLen, int geneLen, int initRate, float mutationRate, int replicationSchema, int crossOverSchema, float recombinationRate, boolean protect){
         this.replicationSchema = replicationSchema;
         this.crossOverSchema   = crossOverSchema;
         this.recombinationRate = recombinationRate;

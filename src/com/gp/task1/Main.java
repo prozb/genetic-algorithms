@@ -9,8 +9,7 @@ import java.util.Optional;
  */
 
 public class Main {
-    private static int NUM_OF_ARGS = 9;
-    private static int RUNS_COUNT  = 100;
+    private final static int NUM_OF_ARGS = 10;
 
     private static String [] arguments;
     private static int generationCount;
@@ -22,11 +21,12 @@ public class Main {
     private static int runsNum;
     private static float mutationRate;
     private static float recombinationRate;
+    private static boolean protect;
 
     private static int [] statArr;
     private static int resPosition = 0;
 
-    // TESTING PARAMETERS: --pm=0.02 --pc=0.5 --genecount=200 --genelen=200 --maxgen=1000 --runs=10 --initrate=5 --crossover_scheme=1 --replication_scheme=1
+    // TESTING PARAMETERS: --pm=0.02 --pc=0.5 --genecount=200 --genelen=200 --maxgen=1000 --runs=10 --protect=best --initrate=5 --crossover_scheme=1 --replication_scheme=1
     public static void main(String[] args) throws InterruptedException {
         arguments = args;
 
@@ -58,6 +58,7 @@ public class Main {
             runsNum           = (int) getValue("--runs");
             mutationRate      = getValue("--pm");
             recombinationRate = getValue("--pc");
+            protect = getStringValue("--protect").equals("best");
 
             statArr = new int [runsNum];
         }
@@ -68,7 +69,7 @@ public class Main {
         String geneLenString = "";
 
         if(geneLenStringOptional.isPresent()){
-            geneLenString = geneLenStringOptional.get().trim();
+            geneLenString = geneLenStringOptional.get().trim().replace(" ", "");
         }
         int pos = geneLenString.indexOf(arg) + 1 + arg.length();
         String num = geneLenString.substring(pos);
@@ -80,6 +81,23 @@ public class Main {
             printError("Number \"" + arg + "\" not found!");
         }
         return val;
+    }
+
+    public static String getStringValue(String arg){
+        Optional<String> geneLenStringOptional = Arrays.stream(arguments).filter(elem -> elem.contains(arg)).findFirst();
+        String geneLenString = "";
+
+        if(geneLenStringOptional.isPresent()){
+            geneLenString = geneLenStringOptional.get().trim().replace(" ", "");
+        }
+        int pos = geneLenString.indexOf(arg) + 1 + arg.length();
+        String val = geneLenString.substring(pos).trim();
+
+        if(val.equals("")){
+            printError("protect option can not be empty!");
+        }
+
+        return val.trim();
     }
 
     private static void printError(String err){
@@ -98,7 +116,8 @@ public class Main {
                 "[--crossover_scheme] (integer number)\n" +
                 "[--replication_scheme] (integer number)\n" +
                 "[--maxgen] maximum generations (integer number)\n" +
-                "[--runs] number of runs (integer number)");
+                "[--runs] number of runs (integer number)\n" +
+                "[--protect] the best gene is crossover and mutation protected (best|none)");
     }
 
     private static void startSimulation() throws InterruptedException {
@@ -111,7 +130,8 @@ public class Main {
 
         int runsCount = maxGenerations;
 
-        DNAPool pool = new DNAPool(generationCount, geneLen, initRate, mutationRate, replicationSchema, crossOverSchema, recombinationRate);
+        DNAPool pool = new DNAPool(generationCount, geneLen, initRate, mutationRate,
+                                    replicationSchema, crossOverSchema, recombinationRate, protect);
         while(!pool.isFinished() && runsCount > 0){
             pool.processCrossOver();
             pool.sortGeneration();
@@ -136,5 +156,11 @@ public class Main {
     // pushes result of the generation into statistics array
     private static void push(int res){
         statArr[resPosition++] = res;
+    }
+
+
+    // Testing purposes
+    public static void setArgs(String [] args){
+        arguments = args;
     }
 }
