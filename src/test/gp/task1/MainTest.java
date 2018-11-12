@@ -3,7 +3,10 @@ package test.gp.task1;
 import com.gp.task1.Main;
 import org.junit.Assert;
 import org.junit.Test;
-
+/**
+ * @author Pavlo Rozbytskyi
+ * @version 2.0.1
+ */
 public class MainTest {
     @Test
     public void getStringValueTest(){

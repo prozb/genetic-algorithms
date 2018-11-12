@@ -1,6 +1,5 @@
 package com.gp.task1;
 
-import javax.lang.model.type.ArrayType;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Optional;
@@ -247,12 +246,16 @@ public class DNAPool {
     }
 
     public void setBestGene(){
-        Optional<DNA> bestGene = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::getFitness));
-        bestGene.ifPresent(DNA::setBest);
+        if(protect) {
+            Optional<DNA> bestGene = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::getFitness));
+            bestGene.ifPresent(DNA::setBest);
+        }
     }
 
     public void unsetBestGene(){
-        Optional<DNA> bestGene = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::isBest));
-        bestGene.ifPresent(DNA::unsetBest);
+        if(protect) {
+            Optional<DNA> bestGene = Arrays.stream(currentGeneration).max(Comparator.comparing(DNA::isBest));
+            bestGene.ifPresent(DNA::unsetBest);
+        }
     }
 }

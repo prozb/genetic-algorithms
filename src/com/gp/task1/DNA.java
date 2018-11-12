@@ -1,10 +1,9 @@
 package com.gp.task1;
 
 import java.util.Arrays;
-
 /**
  * @author Pavlo Rozbytskyi
- * @version 2.0.0
+ * @version 2.0.1
  */
 public class DNA {
     private int len;
