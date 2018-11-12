@@ -7,7 +7,7 @@ import java.util.Optional;
 
 /**
  * @author Pavlo Rozbytskyi
- * @version 2.0.0
+ * @version 2.0.1
  */
 // after each generation loop you must recalculate fitness off all dna's and
 // figure out maximal and minimal fitness
@@ -102,14 +102,9 @@ public class DNAPool {
         int crossOverPerf  = 0;
         int firstGenePos   = 0;
         int secondGenePos  = 0;
-
-        Optional<DNA> bestOpt = Arrays.stream(currentGeneration).filter(DNA::isBest).findFirst();
-        int bestPos = 0;
-        if(bestOpt.isPresent()) {
-            bestPos = Arrays.asList(currentGeneration).indexOf(bestOpt.get());
-        }
-
         int randPos = 0;
+
+        int bestPos = getBestGenePos();
 
         do {
             firstGenePos  = (int) (Math.random() * generationLen);
@@ -148,20 +143,27 @@ public class DNAPool {
     }
 
     public void processMutation(){
+        setBestGene();
+
         int mutationCount     = (int) (mutationRate * geneLen * generationLen) + 1;
         int mutationPerformed = 0;
 
         int randGen = 0;
         int randPos = 0;
 
+        int bestGenePos = getBestGenePos();
+
         do{
             randGen = (int) (Math.random() * generationLen);
-            randPos = (int) (Math.random() * geneLen);
 
-            currentGeneration[randGen].invertCell(randPos);
+            if(randGen != bestGenePos) {
+                randPos = (int) (Math.random() * geneLen);
 
-            mutationCount--;
-            mutationPerformed++;
+                currentGeneration[randGen].invertCell(randPos);
+
+                mutationCount--;
+                mutationPerformed++;
+            }
         }while (mutationCount > 0);
 
         // testing reasons
@@ -169,6 +171,7 @@ public class DNAPool {
             throw new RuntimeException();
         }
 
+        unsetBestGene();
         calcMaxFitnessOfGeneration();
         calcMinFitnessOfGeneration();
     }
@@ -195,6 +198,15 @@ public class DNAPool {
         for(int i = 0; i < currentGeneration.length; i++){
             currentGeneration[i] = bestDNAS[i / 10];
         }
+    }
+
+    public int getBestGenePos(){
+        Optional<DNA> bestOpt = Arrays.stream(currentGeneration).filter(DNA::isBest).findFirst();
+        int bestPos = 0;
+        if(bestOpt.isPresent()) {
+            bestPos = Arrays.asList(currentGeneration).indexOf(bestOpt.get());
+        }
+        return bestPos;
     }
 
     public DNA[] getBestGenes(int selectionPercent){

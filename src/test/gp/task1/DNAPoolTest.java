@@ -219,4 +219,26 @@ public class DNAPoolTest {
 
         Assert.assertFalse(unSet);
     }
+
+    @Test
+    public void protectMutationTest(){
+        int generationLen  = 200;
+        int geneLen        = 200;
+        int initRate       = 5;
+        float mutationRate = 0.02f;
+
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, 0, 0, 0, false);
+
+        Arrays.stream(pool.getGeneration()).forEach(DNA::setBest);
+        pool.getGeneration()[0].unsetBest();
+
+        DNA [] beforeMutation = Arrays.copyOfRange(pool.getGeneration(), 1, pool.getGeneration().length);
+        pool.processMutation();
+        pool.processMutation();
+        pool.processMutation();
+        pool.processMutation();
+        DNA [] afterMutation = Arrays.copyOfRange(pool.getGeneration(), 1, pool.getGeneration().length);
+
+        Assert.assertArrayEquals(beforeMutation, afterMutation);
+    }
 }

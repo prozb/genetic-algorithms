@@ -1,12 +1,8 @@
 package test.gp.task1;
 
-import com.gp.task1.DNA;
-import com.gp.task1.DNAPool;
 import com.gp.task1.Main;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 public class MainTest {
     @Test
