@@ -138,7 +138,7 @@ public class Main {
             pool.sortGeneration();
             pool.processReplication();
             pool.switchToNextGeneration();
-//            pool.printInfo();
+            pool.printInfo();
 
             runsCount--;
         }

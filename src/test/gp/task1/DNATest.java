@@ -1,5 +1,6 @@
 package test.gp.task1;
 
+import com.gp.task1.Constants;
 import com.gp.task1.DNA;
 import org.junit.Assert;
 import org.junit.Test;

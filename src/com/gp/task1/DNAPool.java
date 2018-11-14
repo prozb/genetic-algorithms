@@ -181,6 +181,9 @@ public class DNAPool {
             case 1:
                 replicationSchemaOne();
                 break;
+            case 2:
+                replicationSchemaTwo();
+                break;
             default:
                 throw new RuntimeException("please input replication schema");
         }
@@ -191,7 +194,14 @@ public class DNAPool {
 
     // rank based selection
     private void replicationSchemaTwo(){
+        sortGeneration();
+        processRanking();
+        passRankedGenesIntoGeneration();
+        clearRankings();
+    }
 
+    private void clearRankings(){
+        Arrays.stream(currentGeneration).forEach(DNA::clearPs);
     }
 
     private void processRanking(){
@@ -199,9 +209,32 @@ public class DNAPool {
 
         for(int rank = 1; rank < currentGeneration.length; rank++){
             currentGeneration[rank].calcProbability(rank, generationLen);
-            float prev = currentGeneration[rank - 1].getPsCum();
+            double prev = currentGeneration[rank - 1].getPsCum();
             currentGeneration[rank].calcCumulProbability(prev);
         }
+    }
+
+    private void passRankedGenesIntoGeneration(){
+        DNA [] newGeneration = new DNA[generationLen];
+        Arrays.fill(newGeneration, new DNA(geneLen));
+        for(int i = 0; i < newGeneration.length; i++){
+            newGeneration[i] = getBestRankedDNA();
+        }
+
+        this.currentGeneration = newGeneration;
+    }
+
+    private DNA getBestRankedDNA(){
+        float probability = (float) Math.random();
+
+        for(int i = 1; i < currentGeneration.length; i++){
+            if(probability == currentGeneration[i - 1].getPsCum()){
+                return currentGeneration[i - 1];
+            }else if(probability <= currentGeneration[i].getPsCum() && probability > currentGeneration[i - 1].getPsCum()){
+                return currentGeneration[i];
+            }
+        }
+        return currentGeneration[(int) (Math.random() * geneLen)];
     }
 
     private void replicationSchemaOne(){

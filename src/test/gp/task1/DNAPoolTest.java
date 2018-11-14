@@ -101,7 +101,6 @@ public class DNAPoolTest {
 
         try {
             for (int i = 0; i < pool.getGeneration().length; i++) {
-//            for (int i = pool.getGeneration().length; i > 1; i++) {
                 if (pool.getGeneration()[i].getFitness() > pool.getGeneration()[i].getFitness())
                     throw new RuntimeException();
             }
@@ -263,8 +262,8 @@ public class DNAPoolTest {
 
     @Test
     public void processRankingTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        int generationLen  = 3;
-        int geneLen        = 10;
+        int generationLen  = 20;
+        int geneLen        = 20;
         int initRate       = 5;
         float mutationRate = 0.02f;
 
@@ -276,7 +275,7 @@ public class DNAPoolTest {
         boolean thrown = false;
         DNA [] dnas = pool.getGeneration();
 
-        float prev = 0;
+        double prev = 0;
 
         try {
             for (int i = 0; i < dnas.length; i++) {

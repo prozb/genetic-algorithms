@@ -7,8 +7,8 @@ import java.util.Arrays;
  */
 public class DNA {
     private int len;
-    private float ps;      // probability to be chosen
-    private float psCum;   // cumulated probability
+    private double ps;      // probability to be chosen
+    private double psCum;   // cumulated probability
     private Integer fitness;
     private Integer [] gene;
     private boolean best;
@@ -112,19 +112,24 @@ public class DNA {
     }
 
     public void calcProbability(int r, int n){
-        ps = ((2 - Constants.S) / n) + (2 * r * (Constants.S - 1)) / (n * (n - 1));
-        this.ps = 0;
+        this.ps = ((2 - Constants.S) / n) + (2.0f * r * (Constants.S - 1)) / (n * (n - 1));
+
     }
 
-    public float getPs(){
+    public double getPs(){
         return ps;
     }
 
-    public void calcCumulProbability(float prevPs){
+    public void calcCumulProbability(double prevPs){
         psCum = prevPs + ps;
     }
 
-    public float getPsCum(){
+    public double getPsCum(){
         return psCum;
+    }
+
+    public void clearPs(){
+        ps = 0;
+        psCum = 0;
     }
 }
