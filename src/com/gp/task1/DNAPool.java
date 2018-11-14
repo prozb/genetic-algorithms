@@ -189,6 +189,21 @@ public class DNAPool {
         calcMaxFitnessOfGeneration();
     }
 
+    // rank based selection
+    private void replicationSchemaTwo(){
+
+    }
+
+    private void processRanking(){
+        currentGeneration[0].calcProbability(0, generationLen);
+
+        for(int rank = 1; rank < currentGeneration.length; rank++){
+            currentGeneration[rank].calcProbability(rank, generationLen);
+            float prev = currentGeneration[rank - 1].getPsCum();
+            currentGeneration[rank].calcCumulProbability(prev);
+        }
+    }
+
     private void replicationSchemaOne(){
         int selectionPercent = 10;
 

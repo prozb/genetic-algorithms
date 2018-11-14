@@ -5,6 +5,8 @@ import com.gp.task1.DNAPool;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**
@@ -98,9 +100,9 @@ public class DNAPoolTest {
         pool.sortGeneration();
 
         try {
-//            for (int i = 1; i < pool.getGeneration().length; i++) {
-            for (int i = pool.getGeneration().length; i > 1; i++) {
-                if (pool.getGeneration()[i].getFitness() < pool.getGeneration()[i - 1].getFitness())
+            for (int i = 0; i < pool.getGeneration().length; i++) {
+//            for (int i = pool.getGeneration().length; i > 1; i++) {
+                if (pool.getGeneration()[i].getFitness() > pool.getGeneration()[i].getFitness())
                     throw new RuntimeException();
             }
         }catch (Exception e){
@@ -258,4 +260,36 @@ public class DNAPoolTest {
 
         Assert.assertEquals(result, expected);
     }
+
+    @Test
+    public void processRankingTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        int generationLen  = 3;
+        int geneLen        = 10;
+        int initRate       = 5;
+        float mutationRate = 0.02f;
+
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, mutationRate, 0, 0, 0, false);
+        Method processRanking = pool.getClass().getDeclaredMethod("processRanking");
+        processRanking.setAccessible(true);
+        processRanking.invoke(pool);
+
+        boolean thrown = false;
+        DNA [] dnas = pool.getGeneration();
+
+        float prev = 0;
+
+        try {
+            for (int i = 0; i < dnas.length; i++) {
+                if (dnas[i].getPs() + prev != dnas[i].getPsCum())
+                    throw new RuntimeException();
+                prev = dnas[i].getPsCum();
+            }
+        }catch (Exception e){
+            thrown = true;
+        }
+
+        Assert.assertFalse(thrown);
+    }
 }
+
+
