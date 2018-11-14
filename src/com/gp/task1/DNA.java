@@ -113,7 +113,6 @@ public class DNA {
 
     public void calcProbability(int r, int n){
         this.ps = ((2 - Constants.S) / n) + (2.0f * r * (Constants.S - 1)) / (n * (n - 1));
-
     }
 
     public double getPs(){

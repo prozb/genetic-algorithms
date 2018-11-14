@@ -7,6 +7,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static org.hamcrest.CoreMatchers.is;
+
 /**
  * @author Pavlo Rozbytskyi
  * @version 2.0.1
@@ -59,7 +61,7 @@ public class DNATest {
     }
 
     @Test
-    public void invertCell(){
+    public void invertCellTest(){
         int len = 200;
 
         DNA DNA = new DNA(len);
@@ -71,5 +73,20 @@ public class DNATest {
         int actual = DNA.getGene()[pos];
 
         Assert.assertNotEquals(prev, actual);
+    }
+
+    @Test
+    public void calcProbabilityTest(){
+        int dnaLen   = 200;
+        int genesCnt = 200;
+        int rank     = 10;
+
+        DNA testDNA  = new DNA(dnaLen);
+        testDNA.calcProbability(rank, genesCnt);
+
+        double expected = ((2 - Constants.S)/genesCnt) + (2.0f * rank * (Constants.S - 1))/ (genesCnt * (genesCnt - 1));
+        double actual  = testDNA.getPs();
+
+        Assert.assertEquals(expected, actual, 0);
     }
 }
