@@ -3,6 +3,7 @@ package test.gp.task1;
 import com.gp.task1.DNA;
 import com.gp.task1.DNAPool;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -189,7 +190,7 @@ public class DNAPoolTest {
         int initRate      = 5;
         int bestGenePos   = 10;
 
-        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0, 0, 0, 0, false);
+        DNAPool pool = new DNAPool(generationLen, geneLen, initRate, 0, 0, 0, 0, true);
 
         Integer [] bestArr = new Integer[geneLen];
         Arrays.fill(bestArr, 1);
