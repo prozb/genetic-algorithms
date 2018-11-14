@@ -156,7 +156,7 @@ public class DNAPoolTest {
 
         try{
             for(int i = 0; i < generation.length; i++){
-                if(!generation[i].getFitness().equals(bestGenes[i % 10].getFitness()))
+                if(!generation[i].getFitness().equals(bestGenes[i / 10].getFitness()))
                     throw new RuntimeException();
             }
         }catch (Exception e){
