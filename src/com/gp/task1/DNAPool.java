@@ -213,7 +213,7 @@ public class DNAPool {
             double prev = currentGeneration[rank - 1].getPsCum();
             currentGeneration[rank].calcCumulProbability(prev);
         }
-        printOutRankTable();/////////TESTING REASONS
+//        printOutRankTable();/////////TESTING REASONS
     }
 
     private void passRankedGenesIntoGeneration(){
@@ -233,17 +233,17 @@ public class DNAPool {
 
         for(int i = 1; i < currentGeneration.length; i++){
             if(probability == currentGeneration[i - 1].getPsCum()){
-                System.out.println("prob: " + probability + "chosen DNA is Nr." + (i - 1) + " fitness = " + currentGeneration[i - 1].getFitness() +
-                " psCum = " + currentGeneration[i - 1].getPsCum());
+//                System.out.println("prob: " + probability + "chosen DNA is Nr." + (i - 1) + " fitness = " + currentGeneration[i - 1].getFitness() +
+//                " psCum = " + currentGeneration[i - 1].getPsCum());
                 return currentGeneration[i - 1];
             }else if(probability <= currentGeneration[i].getPsCum() && probability > currentGeneration[i - 1].getPsCum()){
-                System.out.println("prob: " + probability +  "chosen DNA is Nr." + (i) + " fitness = " + currentGeneration[i].getFitness() +
-                        " psCum = " + currentGeneration[i].getPsCum());
+//                System.out.println("prob: " + probability +  "chosen DNA is Nr." + (i) + " fitness = " + currentGeneration[i].getFitness() +
+//                        " psCum = " + currentGeneration[i].getPsCum());
                 return currentGeneration[i];
             }
         }
-        System.out.println("prob: " + probability + "chosen DNA is Nr." + (currentGeneration.length - 1) + " fitness = " + currentGeneration[currentGeneration.length - 1].getFitness() +
-                " psCum = " + currentGeneration[currentGeneration.length - 1].getPsCum());
+//        System.out.println("prob: " + probability + "chosen DNA is Nr." + (currentGeneration.length - 1) + " fitness = " + currentGeneration[currentGeneration.length - 1].getFitness() +
+//                " psCum = " + currentGeneration[currentGeneration.length - 1].getPsCum());
         return currentGeneration[currentGeneration.length - 1];
     }
 
