@@ -131,4 +131,8 @@ public class DNA {
         ps = 0;
         psCum = 0;
     }
+
+    public void printRank(){
+        System.out.println("ps: " + ps + " psCum: " + psCum);
+    }
 }

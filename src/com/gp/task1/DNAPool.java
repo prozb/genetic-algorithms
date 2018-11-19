@@ -205,6 +205,7 @@ public class DNAPool {
     }
 
     private void processRanking(){
+//        printOutRankTable();////////TESTING REASONS
         currentGeneration[0].calcProbability(0, generationLen);
 
         for(int rank = 1; rank < currentGeneration.length; rank++){
@@ -212,6 +213,7 @@ public class DNAPool {
             double prev = currentGeneration[rank - 1].getPsCum();
             currentGeneration[rank].calcCumulProbability(prev);
         }
+        printOutRankTable();/////////TESTING REASONS
     }
 
     private void passRankedGenesIntoGeneration(){
@@ -224,17 +226,25 @@ public class DNAPool {
         this.currentGeneration = newGeneration;
     }
 
+    //TODO: How to test this method?????
+    //TODO: need refactoring?
     private DNA getBestRankedDNA(){
-        float probability = (float) Math.random();
+        double probability = Math.random();
 
         for(int i = 1; i < currentGeneration.length; i++){
             if(probability == currentGeneration[i - 1].getPsCum()){
+                System.out.println("prob: " + probability + "chosen DNA is Nr." + (i - 1) + " fitness = " + currentGeneration[i - 1].getFitness() +
+                " psCum = " + currentGeneration[i - 1].getPsCum());
                 return currentGeneration[i - 1];
             }else if(probability <= currentGeneration[i].getPsCum() && probability > currentGeneration[i - 1].getPsCum()){
+                System.out.println("prob: " + probability +  "chosen DNA is Nr." + (i) + " fitness = " + currentGeneration[i].getFitness() +
+                        " psCum = " + currentGeneration[i].getPsCum());
                 return currentGeneration[i];
             }
         }
-        return currentGeneration[(int) (Math.random() * geneLen)];
+        System.out.println("prob: " + probability + "chosen DNA is Nr." + (currentGeneration.length - 1) + " fitness = " + currentGeneration[currentGeneration.length - 1].getFitness() +
+                " psCum = " + currentGeneration[currentGeneration.length - 1].getPsCum());
+        return currentGeneration[currentGeneration.length - 1];
     }
 
     private void replicationSchemaOne(){
@@ -279,7 +289,10 @@ public class DNAPool {
     }
 
     public boolean isFinished(){
-        return finished;
+        if(maxFitness >= geneLen){
+            return true;
+        }
+        return false;
     }
 
     public void printInfo(){
@@ -306,4 +319,10 @@ public class DNAPool {
             bestGene.ifPresent(DNA::unsetBest);
         }
     }
+
+    //TODO: print out rank based selection table for debugging reasons
+    public void printOutRankTable(){
+        Arrays.stream(currentGeneration).forEach(DNA::printRank);
+    }
+
 }
