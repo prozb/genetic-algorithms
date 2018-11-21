@@ -3,7 +3,6 @@ package test.gp.task1;
 import com.gp.task1.DNA;
 import com.gp.task1.DNAPool;
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
