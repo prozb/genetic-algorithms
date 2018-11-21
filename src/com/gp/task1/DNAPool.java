@@ -63,7 +63,7 @@ public class DNAPool {
 
         if(maxFitness == geneLen) {
             finished = true;
-            printInfo();
+            //printInfo();
         }
     }
 
