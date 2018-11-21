@@ -8,8 +8,8 @@ public class Constants {
     public final static float PC_MAX = 0.51f;
     public final static float PC_STEP = 0.02f;
 
-    public final static float PM_MIN = 0.00f;
+    public final static float PM_MIN = 0.000f;
 //    public final static float PM_MAX = 0.01f;
-    public final static float PM_MAX = 0.004f;
+    public final static float PM_MAX = 0.01f;
     public final static float PM_STEP = 0.002f;
 }

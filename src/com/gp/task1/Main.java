@@ -18,7 +18,6 @@ public class Main {
     private static boolean protect;
 
     private static int [] statArr;
-    private int resPosition;
     private StringBuilder sb;
     private BufferedWriter writer;
     public static String [] arguments;
@@ -30,7 +29,9 @@ public class Main {
         processUserInput();
         System.err.println("start thread");
         Simulation simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate, runsNum,
-                replicationSchema, crossOverSchema, maxGenerations, initRate, protect);
+                replicationSchema, crossOverSchema, maxGenerations, initRate, protect, Constants.PC_MIN, 0.52f,
+                Constants.PC_STEP, Constants.PM_MIN, Constants.PM_STEP * 4, Constants.PM_STEP);
+
         Thread thread = new Thread(simulation);
         thread.start();
         System.err.println("started thread");
