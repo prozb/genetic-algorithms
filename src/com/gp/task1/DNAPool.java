@@ -194,7 +194,7 @@ public class DNAPool {
 
     // rank based selection
     private void replicationSchemaTwo(){
-        sortGeneration();
+        //sortGeneration();
         processRanking();
         passRankedGenesIntoGeneration();
         clearRankings();

@@ -1,5 +1,9 @@
 package com.gp.task1;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -25,14 +29,57 @@ public class Main {
 
     private static int [] statArr;
     private static int resPosition = 0;
+    private static StringBuilder sb = new StringBuilder();
+    private static BufferedWriter writer;
 
     // TESTING PARAMETERS: --pm=0.02 --pc=0.5 --genecount=200 --genelen=200 --maxgen=1000 --runs=10 --protect=best --initrate=5 --crossover_scheme=1 --replication_scheme=1
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         arguments = args;
-
+        exportBufferToFile();
         processUserInput();
         startSimulation();
-        showStatistics();
+//        graphSimulation();
+        printStatistics();
+    }
+
+
+    public static void graphSimulation() throws InterruptedException, IOException {
+        sb.setLength(0);
+
+        float genCount = 0;
+        for(float i = Constants.PC_MIN; i <= Constants.PC_MAX; i += Constants.PC_STEP){
+            for(float j = Constants.PM_MIN; j < Constants.PM_MAX; j += Constants.PM_STEP){
+                mutationRate = j;
+                recombinationRate = i;
+
+                System.out.println("pc = " + i + " pm = " + j);
+                startSimulation();
+
+                genCount = calcStatistics();
+                exportToBuffer(mutationRate, recombinationRate, genCount);
+            }
+            sb.append("\n");
+        }
+        exportBufferToFile();
+    }
+
+    private static void exportBufferToFile() throws IOException {
+            writer = new BufferedWriter(new FileWriter("plot.txt"));
+            writer.write(sb.toString());
+            writer.flush();
+            writer.close();
+//        }else {
+//            printError("Cannot create file!");
+//        }
+    }
+
+    private static void exportToBuffer(float pc, float pm, float averCount){
+        sb.append(pm);
+        sb.append("\t");
+        sb.append(pc);
+        sb.append("\t");
+        sb.append(averCount);
+        sb.append("\t\n");
     }
 
     private static void processUserInput(){
@@ -121,13 +168,14 @@ public class Main {
     }
 
     private static void startSimulation() throws InterruptedException {
-        while (runsNum > 0){
+        int localRunsNum = runsNum;
+
+        while (localRunsNum > 0){
             run();
-            runsNum--;
+            localRunsNum--;
         }
     }
     private static void run() {
-
         int runsCount = maxGenerations;
 
         DNAPool pool = new DNAPool(generationCount, geneLen, initRate, mutationRate,
@@ -138,18 +186,22 @@ public class Main {
             pool.sortGeneration();
             pool.processReplication();
             pool.switchToNextGeneration();
-            pool.printInfo();
-
             runsCount--;
+
         }
+        pool.printInfo();
         push(pool.getGenerationsCount() - 1);
     }
 
-    private static void showStatistics(){
-        int count     = Arrays.stream(statArr).sum();
-        float average = count / statArr.length;
+    private static float calcStatistics(){
+        int count = Arrays.stream(statArr).sum();
+        clear();
+        return count / statArr.length;
+    }
+
+    public static void printStatistics(){
         System.out.printf("\n==================================================\n" +
-                "to achieve complete fitness, you need average %.4f generations", average);
+                "to achieve complete fitness, you need average %.4f generations", calcStatistics());
     }
 
     // pushes result of the generation into statistics array
@@ -157,6 +209,10 @@ public class Main {
         statArr[resPosition++] = res;
     }
 
+    private static void clear(){
+        resPosition = 0;
+        Arrays.fill(statArr, 0);
+    }
 
     // Testing purposes
     public static void setArgs(String [] args){
