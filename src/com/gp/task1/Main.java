@@ -1,11 +1,17 @@
 package com.gp.task1;
 
+
 import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+
 
 public class Main {
-    private static final int NUM_OF_ARGS = 10;
     private static int generationCount;
     private static int geneLen;
     private static int replicationSchema;
@@ -18,28 +24,94 @@ public class Main {
     private static boolean protect;
 
     private static int [] statArr;
-    private StringBuilder sb;
-    private BufferedWriter writer;
+    private static StringBuilder sBuilder;
+    private static BufferedWriter writer;
     public static String [] arguments;
 
+    public static boolean threaded = true;
+
     // TESTING PARAMETERS: --pm=0.02 --pc=0.5 --genecount=200 --genelen=200 --maxgen=1000 --runs=10 --protect=best --initrate=5 --crossover_scheme=1 --replication_scheme=1
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         arguments = args;
+        sBuilder  = new StringBuilder();
 
         processUserInput();
-        System.err.println("start thread");
-        Simulation simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate, runsNum,
-                replicationSchema, crossOverSchema, maxGenerations, initRate, protect, Constants.PC_MIN, 0.52f,
-                Constants.PC_STEP, Constants.PM_MIN, Constants.PM_STEP * 4, Constants.PM_STEP);
 
-        Thread thread = new Thread(simulation);
-        thread.start();
-        System.err.println("started thread");
-        while (!simulation.isReady()){
-            System.err.println("waiting");
-            Thread.sleep(1000);
+        if(threaded) {
+            int permNumber =  (int)((((Constants.PM_MAX - Constants.PM_MIN) / Constants.PM_STEP) *
+                                    ((Constants.PC_MAX - Constants.PC_MIN) / Constants.PC_STEP)) + 0.5f);
+            int threadsNum = permNumber / 30;
+            //TODO: how to chose optimal num of threads??
+            ExecutorService executors = Executors.newFixedThreadPool(threadsNum);
+            Simulation [] simulations = new Simulation[threadsNum];
+
+            System.err.println("start " + threadsNum + " threads");
+
+            int simulPos  = 0;
+            float pcStart = Constants.PC_MIN;
+            float pmStart = Constants.PM_MIN;
+            float pmEnd   = (Constants.PM_MAX - Constants.PM_MIN) / threadsNum;
+            float pcEnd   = (Constants.PC_MAX - Constants.PC_MIN) / threadsNum;
+
+            float pmConstStep = pmStart + pmEnd;
+            float pcConstStep = pcStart + pcEnd;
+
+            for (int i = 0; i < threadsNum; i++) {
+
+                Simulation simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate, runsNum,
+                        replicationSchema, crossOverSchema, maxGenerations, initRate, protect, pcStart, pcConstStep,
+                        Constants.PC_STEP, pmStart, pmConstStep, Constants.PM_STEP);
+
+                System.err.println("started simulation #" + i + " with pcStart = " + pcStart +
+                " pcEnd = " + pcConstStep + " pmStart = " + pmStart + " pmEnd = " + pmConstStep + "\n" +
+                        new String(new char[100]).replace("\0", "=") + "\n");
+                pcStart = pcConstStep;
+                pmStart = pmConstStep;
+
+                pmConstStep += pmEnd;
+                pcConstStep += pcEnd;
+
+                simulations[simulPos++] = simulation;
+
+                executors.execute(simulation);
+            }
+            System.err.println("started " + threadsNum + " threads");
+            executors.shutdown();
+            while (!executors.isTerminated()){
+                System.err.println("waiting");
+                Thread.sleep(1000);
+            }
+
+            for(Simulation simulation : simulations){
+                sBuilder.append(simulation.getStringBuilder().toString());
+            }
+            exportBufferToFile();
+        }else {
+            System.err.println("start thread");
+            Simulation simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate, runsNum,
+                    replicationSchema, crossOverSchema, maxGenerations, initRate, protect, Constants.PC_MIN, Constants.PC_MAX,
+                    Constants.PC_STEP, Constants.PM_MIN, Constants.PM_MIN, Constants.PM_STEP);
+
+            Thread thread = new Thread(simulation);
+            thread.start();
+            System.err.println("started thread");
+
+            //TODO: isReady deprecated
+            while (!simulation.isReady()){
+                System.err.println("waiting");
+                Thread.sleep(1000);
+            }
+//            System.err.println(simulation.getStringBuilder().toString());
+            sBuilder.append(simulation.getStringBuilder().toString());
+            exportBufferToFile();
         }
-        System.err.println(simulation.getStringBuilder().toString());
+    }
+
+    private static void exportBufferToFile() throws IOException {
+        writer = new BufferedWriter(new FileWriter("plot.txt"));
+        writer.write(sBuilder.toString());
+        writer.flush();
+        writer.close();
     }
 
     private static void processUserInput(){
@@ -49,10 +121,10 @@ public class Main {
         }else if(arguments[1].equals("--help")){
             printHelpMessage();
             System.exit(99);
-        }else if(arguments.length < NUM_OF_ARGS){
+        }else if(arguments.length < Constants.NUM_OF_ARGS){
             printHelpMessage();
             printError("Not enough parameters!");
-        }else if(arguments.length > NUM_OF_ARGS){
+        }else if(arguments.length > Constants.NUM_OF_ARGS){
             printHelpMessage();
             printError("To many parameters!");
         }else {
@@ -107,7 +179,7 @@ public class Main {
         return val.trim();
     }
 
-    private static void printError(String err){
+    public static void printError(String err){
         System.out.println("Error: " + err);
         System.exit(99);
     }

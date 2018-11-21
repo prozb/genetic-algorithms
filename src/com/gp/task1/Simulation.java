@@ -1,11 +1,8 @@
 package com.gp.task1;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Optional;
 
 /**
  * @author Pavlo Rozbytskyi
@@ -71,8 +68,9 @@ public class Simulation implements Runnable{
             printStatistics();
 //            exportBufferToFile();
         }catch (Exception e){
-
+            Main.printError("Cannot execute simulation " + e.toString());
         }
+        System.err.println("Thread finished");
     }
 
 
@@ -85,7 +83,7 @@ public class Simulation implements Runnable{
                 mutationRate = j;
                 recombinationRate = i;
 
-                System.err.println("pc = " + i + " pm = " + j);
+//                System.err.println("pc = " + i + " pm = " + j);
                 startSimulation();
 
                 genCount = calcStatistics();
@@ -93,16 +91,8 @@ public class Simulation implements Runnable{
             }
             sb.append("\n");
         }
-
-        setReady();
-//        exportBufferToFile();
-    }
-
-    private void exportBufferToFile() throws IOException {
-            writer = new BufferedWriter(new FileWriter("plot.txt"));
-            writer.write(sb.toString());
-            writer.flush();
-            writer.close();
+        System.err.println(sb.toString());
+//        setReady();
     }
 
     private void exportToBuffer(float pc, float pm, float averCount){
@@ -173,89 +163,4 @@ public class Simulation implements Runnable{
     public StringBuilder getStringBuilder(){
         return sb;
     }
-
-//    private void processUserInput(){
-//        if(arguments.length <= 1){
-//            printHelpMessage();
-//            printError("No parameters!");
-//        }else if(arguments[1].equals("--help")){
-//            printHelpMessage();
-//            System.exit(99);
-//        }else if(arguments.length < NUM_OF_ARGS){
-//            printHelpMessage();
-//            printError("Not enough parameters!");
-//        }else if(arguments.length > NUM_OF_ARGS){
-//            printHelpMessage();
-//            printError("To many parameters!");
-//        }else {
-//            generationCount   = (int) getValue("--genecount");
-//            geneLen           = (int) getValue("--genelen");
-//            crossOverSchema   = (int) getValue("--crossover_scheme");
-//            replicationSchema = (int) getValue("--replication_scheme");
-//            initRate          = (int) getValue("--initrate");
-//            maxGenerations    = (int) getValue("--maxgen");
-//            runsNum           = (int) getValue("--runs");
-//            mutationRate      = getValue("--pm");
-//            recombinationRate = getValue("--pc");
-//            protect = getStringValue("--protect").equals("best");
-//
-//            statArr = new int [runsNum];
-//        }
-//    }
-
-//    private float getValue(String arg){
-//        Optional<String> geneLenStringOptional = Arrays.stream(arguments).filter(elem -> elem.contains(arg)).findFirst();
-//        String geneLenString = "";
-//
-//        if(geneLenStringOptional.isPresent()){
-//            geneLenString = geneLenStringOptional.get().trim().replace(" ", "");
-//        }
-//        int pos = geneLenString.indexOf(arg) + 1 + arg.length();
-//        String num = geneLenString.substring(pos);
-//
-//        float val = 0;
-//        try {
-//            val = Float.parseFloat(num);
-//        }catch (NumberFormatException e){
-//            printError("Number \"" + arg + "\" not found!");
-//        }
-//        return val;
-//    }
-//
-//    public String getStringValue(String arg){
-//        Optional<String> geneLenStringOptional = Arrays.stream(arguments).filter(elem -> elem.contains(arg)).findFirst();
-//        String geneLenString = "";
-//
-//        if(geneLenStringOptional.isPresent()){
-//            geneLenString = geneLenStringOptional.get().trim().replace(" ", "");
-//        }
-//        int pos = geneLenString.indexOf(arg) + 1 + arg.length();
-//        String val = geneLenString.substring(pos).trim();
-//
-//        if(val.equals("")){
-//            printError("protect option can not be empty!");
-//        }
-//
-//        return val.trim();
-//    }
-
-//    private void printError(String err){
-//        System.out.println("Error: " + err);
-//        System.exit(99);
-//    }
-//
-//    private void printHelpMessage(){
-//        System.out.println("\nusage:\n--------------------------------------------" +
-//                " \n [--help]\nto process simulation you must enter all following args\n" +
-//                "[--pc] recombination rate (float number)\n" +
-//                "[--pm] mutations rate (float number)\n" +
-//                "[--initrate] initiations rate (integer number)\n" +
-//                "[--genecnt] count of genes in generation (integer number)\n" +
-//                "[--genelen] length of the gene (integer number)\n" +
-//                "[--crossover_scheme] (integer number)\n" +
-//                "[--replication_scheme] (integer number)\n" +
-//                "[--maxgen] maximum generations (integer number)\n" +
-//                "[--runs] number of runs (integer number)\n" +
-//                "[--protect] the best gene is crossover and mutation protected (best|none)");
-//    }
 }
