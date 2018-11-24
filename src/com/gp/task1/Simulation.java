@@ -3,15 +3,16 @@ package com.gp.task1;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.Callable;
 
 /**
  * @author Pavlo Rozbytskyi
  * @version 3.0.1
  */
 
-public class Simulation implements Runnable{
+public class Simulation implements Callable<String>{
     public int simulationsCount;
-
+    public static int counter;
     private int generationCount;
     private int geneLen;
     private int replicationSchema;
@@ -23,24 +24,21 @@ public class Simulation implements Runnable{
     private float recombinationRate;
     private boolean protect;
 
-    private float pcMin;
-    private float pcMax;
-    private float pcStep;
-    private float pmMin;
-    private float pmMax;
-    private float pmStep;
-
     private int [] statArr;
     private int resPosition;
     private int simulationNum;
     private StringBuilder sb;
-    private Point [] points;
+    private Point point;
 
     private volatile boolean ready;
 
+    static {
+        counter = 0;
+    }
+
     public Simulation(int geneLen, int generationCount, float mutationRate, float recombinationRate, int runsNum,
                       int replicationSchema, int crossOverSchema, int maxGenerations, int initRate, boolean protect,
-                      int simulationNum, Point [] points){
+                      int simulationNum, Point point){
 
         this.generationCount   = generationCount;
         this.recombinationRate = recombinationRate;
@@ -50,7 +48,7 @@ public class Simulation implements Runnable{
         this.mutationRate      = mutationRate;
         this.simulationNum     = simulationNum;
 
-        this.points   = points;
+        this.point   = point;
         this.runsNum  = runsNum;
         this.initRate = initRate;
         this.protect  = protect;
@@ -59,7 +57,7 @@ public class Simulation implements Runnable{
         this.sb       = new StringBuilder();
     }
     // TESTING PARAMETERS: --pm=0.02 --pc=0.5 --genecount=200 --genelen=200 --maxgen=1000 --runs=10 --protect=best --initrate=5 --crossover_scheme=1 --replication_scheme=1
-    public void run() {
+    public String call() {
         try {
 //        startSimulation();
             graphSimulation();
@@ -68,31 +66,30 @@ public class Simulation implements Runnable{
         }catch (Exception e){
             Main.printError("Cannot execute simulation " + e.toString());
         }
-        System.err.println("Thread #" + simulationNum + " finished");
+        System.err.println("Thread #" + counter + " finished");
+
+        return sb.toString();
     }
 
 
-    public void graphSimulation() throws InterruptedException, IOException {
+    private void graphSimulation() throws InterruptedException, IOException {
         sb.setLength(0);
 
-        int counter    = 0;
         float genCount = 0;
 
-        for(int i = 0; i < points.length; i++){
-                System.err.println("===> Thread $" + simulationNum + " simulation #" + counter + " started");
-                mutationRate      = points[i].getPm();
-                recombinationRate = points[i].getPc();
+        //System.err.println("===> Thread $" + simulationNum + " simulation #" + counter + " started");
+        mutationRate      = point.getPm();
+        recombinationRate = point.getPc();
 
-                startSimulation();
+        startSimulation();
 
-                genCount = calcStatistics();
-                exportToBuffer(mutationRate, recombinationRate, genCount);
-                System.err.println("===> Thread $" + simulationNum + " simulation #" + counter + " finished");
-                counter++;
-                simulationsCount++;
-        }
+        genCount = calcStatistics();
+        exportToBuffer(mutationRate, recombinationRate, genCount);
+        counter++;
+        System.err.println("===> Thread $" + Thread.currentThread().getId() + " simulation #" + counter + " finished");
+
         sb.append("\n");
-        System.err.println("===> Thread $" + simulationNum + " | " + simulationsCount +  " simulations finished");
+        System.err.println("===> Thread $" + Thread.currentThread().getId()  + " | " + simulationsCount +  " simulations finished");
     }
 
     private void exportToBuffer(float pc, float pm, float averCount){
@@ -108,9 +105,9 @@ public class Simulation implements Runnable{
         int localRunsNum = runsNum;
         int runsCounter  = 0;
         while (localRunsNum > 0){
-            System.err.println("Thread $" + simulationNum +  " run #" + runsCounter + " started");
+//            System.err.println("Thread $" +  Thread.currentThread().getId() +  " run #" + runsCounter + " started");
             runSimulation();
-            System.err.println("Thread $" + simulationNum +  " run #" + runsCounter + " finished");
+            System.err.println("Thread $" + Thread.currentThread().getId()  +  " run #" + runsCounter + " finished");
             localRunsNum--;
             runsCounter++;
         }

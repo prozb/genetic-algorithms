@@ -4,8 +4,11 @@ package com.gp.task1;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -45,72 +48,51 @@ public class Main {
 
         processUserInput();
 
-        if(threaded) {
-            int permNumber          =  (int)((((Constants.PM_MAX - Constants.PM_MIN) / Constants.PM_STEP) *
-                                    ((Constants.PC_MAX - Constants.PC_MIN) / Constants.PC_STEP)) + 0.5f);
-            int threadsNum          = permNumber / 30;
-            int simulationPerThread = permNumber / threadsNum;
-            //creates array with points with pm and pc to pass into each simulation
-            calculatePointsToProcess(permNumber);
+        int permNumber          =  (int)((((Constants.PM_MAX - Constants.PM_MIN) / Constants.PM_STEP) *
+                                ((Constants.PC_MAX - Constants.PC_MIN) / Constants.PC_STEP)) + 0.5f);
+        int threadsNum          = 8;
+        //creates array with points with pm and pc to pass into each simulation
+        calculatePointsToProcess(permNumber);
 
-            ExecutorService executors = Executors.newFixedThreadPool(threadsNum);
-            Simulation [] simulations = new Simulation[threadsNum];
+        ExecutorService executors = Executors.newFixedThreadPool(threadsNum);
+        List<Callable<String>> simulations = new ArrayList<>();
 
-            System.err.println("start " + threadsNum + " threads");
+        System.err.println("start " + threadsNum + " threads");
 
-            int simulationPos  = 0;
+        for (int i = 0; i < permNumber; i++) {
 
-            int startPos = 0;
-            int endPos   = simulationPerThread;
+            Callable<String> simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate,
+                    runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, i,
+                    points[i]);
 
-            for (int i = 0; i < threadsNum; i++) {
-
-                Simulation simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate,
-                        runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, i,
-                        Arrays.copyOfRange(points, startPos, endPos));
-
-                startPos = endPos;
-                endPos  += simulationPerThread;
-
-                simulations[simulationPos++] = simulation;
-                executors.execute(simulation);
-            }
-            System.err.println("started " + threadsNum + " threads");
-            executors.shutdown();
-            while (!executors.isTerminated()){
-//                System.err.println("#Main Thread waiting");
-//                Thread.sleep(1000);
-//                if(relativeTime >= System.nanoTime() / 10000){
-//                    System.err.println("Time: duration = " + TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - startTime) + "s");
-//                    relativeTime = System.nanoTime();
-//                }
-            }
-
-//            System.err.println("Simulations count: " + Simulation.simulationsCount);
-            for(Simulation simulation : simulations){
-                sBuilder.append(simulation.getStringBuilder().toString());
-            }
-            exportBufferToFile();
-            System.err.println("Time: complete program duration = " + TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - startTime) + "s");
-        }else {
-//            System.err.println("start thread");
-//            Simulation simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate, runsNum,
-//                    replicationSchema, crossOverSchema, maxGenerations, initRate, protect, Constants.PC_MIN, Constants.PC_MAX,
-//                    Constants.PC_STEP, Constants.PM_MIN, Constants.PM_MIN, Constants.PM_STEP, 0);
-//
-//            Thread thread = new Thread(simulation);
-//            thread.start();
-//            System.err.println("started thread");
-//
-//            //TODO: isReady deprecated
-//            while (!simulation.isReady()){
-//                Thread.sleep(2000);
-//            }
-//            sBuilder.append(simulation.getStringBuilder().toString());
-//            exportBufferToFile();
+            simulations.add(simulation);
         }
+
+        executors.invokeAll(simulations)
+                .stream()
+                .map(future -> {
+                    try{
+                        return future.get();
+                    }catch (Exception e){
+                        throw new IllegalStateException(e);
+                    }
+                })
+                .forEach(s -> {
+                    System.out.println(s);
+                    push(s);
+                });
+
+        System.err.println("started " + threadsNum + " threads");
+        executors.shutdown();
+
+        System.err.println("Simulations count: " + Simulation.counter);
+        exportBufferToFile();
+        System.err.println("Time: complete program duration = " + TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - startTime) + "s");
     }
 
+    public static void push(String s){
+        sBuilder.append(s);
+    }
     public static void calculatePointsToProcess(int pointsNum){
         points = new Point[pointsNum];
         //scale factors just to iterate over integers, not floats
