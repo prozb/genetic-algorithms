@@ -1,12 +1,13 @@
 package com.gp.task1;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+
 public class Test {
     public static void main(String[] args) {
-        for(float i = Constants.PC_MIN; i < Constants.PC_MAX; i += Constants.PC_STEP){
-            for(float j = Constants.PM_MIN; j < Constants.PM_MAX; j += Constants.PM_STEP){
-                System.out.printf("(%.2f|%.3f) , ", i, j);
-            }
-            System.out.println();
-        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
+        System.out.println(sdf.format(new Date()));
     }
 }

@@ -26,7 +26,6 @@ public class Simulation implements Callable<String>{
 
     private int [] statArr;
     private int resPosition;
-    private int simulationNum;
     private StringBuilder sb;
     private Point point;
 
@@ -38,7 +37,7 @@ public class Simulation implements Callable<String>{
 
     public Simulation(int geneLen, int generationCount, float mutationRate, float recombinationRate, int runsNum,
                       int replicationSchema, int crossOverSchema, int maxGenerations, int initRate, boolean protect,
-                      int simulationNum, Point point){
+                      Point point){
 
         this.generationCount   = generationCount;
         this.recombinationRate = recombinationRate;
@@ -46,7 +45,6 @@ public class Simulation implements Callable<String>{
         this.crossOverSchema   = crossOverSchema;
         this.maxGenerations    = maxGenerations;
         this.mutationRate      = mutationRate;
-        this.simulationNum     = simulationNum;
 
         this.point   = point;
         this.runsNum  = runsNum;
@@ -149,17 +147,5 @@ public class Simulation implements Callable<String>{
     private void clear(){
         resPosition = 0;
         Arrays.fill(statArr, 0);
-    }
-
-    public boolean isReady(){
-        return ready;
-    }
-
-    public void setReady(){
-        this.ready = true;
-    }
-
-    public StringBuilder getStringBuilder(){
-        return sb;
     }
 }

@@ -4,16 +4,18 @@ package com.gp.task1;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import org.apache.log4j.*;
 
-
+/**
+ * @author Pavlo Rozbytskyi
+ * @version 3.0.1
+ */
 public class Main {
     private static int generationCount;
     private static int geneLen;
@@ -26,45 +28,48 @@ public class Main {
     private static float recombinationRate;
     private static boolean protect;
 
-    private static int [] statArr;
     private static StringBuilder sBuilder;
     private static BufferedWriter writer;
-    public static String [] arguments;
-    public static Point [] points;
-    public static int pointsPos;
+    private static String [] arguments;
+    private static Point [] points;
+    private static int pointsPos;
 
-    public static boolean threaded = true;
-    public static long startTime;
-    public static long relativeTime;
+    private static long startTime;
+    private static Date date;
+    private static SimpleDateFormat sdfDate;
+    private static SimpleDateFormat sdfFile;
+
+    private static final Logger logger = Logger.getLogger(Main.class);
 
     // TESTING PARAMETERS: --pm=0.02 --pc=0.5 --genecount=200 --genelen=200 --maxgen=1000 --runs=10 --protect=best --initrate=5 --crossover_scheme=1 --replication_scheme=1
     public static void main(String[] args) throws InterruptedException, IOException {
         arguments = args;
         sBuilder  = new StringBuilder();
+        date      = new Date();
+        sdfDate   = new SimpleDateFormat(Constants.DATE_PATTERN);
+        sdfFile   = new SimpleDateFormat(Constants.DATE_FILE_PATTERN);
 
         //process time
         startTime    = System.nanoTime();
-        relativeTime = startTime;
 
+        BasicConfigurator.configure();
         processUserInput();
+        int permNumber  =  (int)((((Constants.PM_MAX - Constants.PM_MIN) / Constants.PM_STEP) *
+                                  ((Constants.PC_MAX - Constants.PC_MIN) / Constants.PC_STEP)) + 0.5f);
 
-        int permNumber          =  (int)((((Constants.PM_MAX - Constants.PM_MIN) / Constants.PM_STEP) *
-                                ((Constants.PC_MAX - Constants.PC_MIN) / Constants.PC_STEP)) + 0.5f);
-        int threadsNum          = 1;
         //creates array with points with pm and pc to pass into each simulation
         calculatePointsToProcess(permNumber);
-
-        ExecutorService executors = Executors.newFixedThreadPool(threadsNum);
+        //creating executors to execute all simulations tasks
+        ExecutorService executors = Executors.newFixedThreadPool(Constants.THREADS_NUM);
         List<Callable<String>> simulations = new ArrayList<>();
 
-        System.err.println("start " + threadsNum + " threads");
+        logger.info("Program started at " + sdfDate.format(date));
+        logger.info("Creating " + Constants.THREADS_NUM + " threads");
 
+        //creating simulations to be executed by thread pool
         for (int i = 0; i < permNumber; i++) {
-
             Callable<String> simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate,
-                    runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, i,
-                    points[i]);
-
+                    runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, points[i]);
             simulations.add(simulation);
         }
 
@@ -77,23 +82,22 @@ public class Main {
                         throw new IllegalStateException(e);
                     }
                 })
-                .forEach(s -> {
-                    System.out.println(s);
-                    push(s);
-                });
+                .forEach(Main::pushIntoBuilder);
 
-        System.err.println("started " + threadsNum + " threads");
         executors.shutdown();
-
-        System.err.println("Simulations count: " + Simulation.counter);
+        logger.info("Finished " + Simulation.counter + " simulations");
         exportBufferToFile();
-        System.err.println("Time: complete program duration = " + TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - startTime) + "s");
+        logger.info("Time: complete program duration = " + TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - startTime) + "s");
+        logger.info("Program execution finished at " + sdfDate.format(new Date()));
     }
 
-    public static void push(String s){
+    //pushing string into builder after simulation completed
+    private static void pushIntoBuilder(String s){
         sBuilder.append(s);
     }
-    public static void calculatePointsToProcess(int pointsNum){
+
+    //creating array with points to pass into each task
+    private static void calculatePointsToProcess(int pointsNum){
         points = new Point[pointsNum];
         //scale factors just to iterate over integers, not floats
         for(int i = (int) (Constants.PC_MIN * Constants.SCALE_FACTOR); i < (int)(Constants.PC_MAX * Constants.SCALE_FACTOR); i += (int)(Constants.PC_STEP * Constants.SCALE_FACTOR)){
@@ -102,12 +106,18 @@ public class Main {
                                                  i / (Constants.SCALE_FACTOR + 0.0f));
             }
         }
+        logger.info("Created " + points.length + " simulations");
     }
+
+    //exporting string builder to file
     private static void exportBufferToFile() throws IOException {
-        writer = new BufferedWriter(new FileWriter("plot.txt"));
+        String fileName = "plot" +  sdfFile.format(date) + ".txt";
+        logger.info("Creating file " + fileName);
+        writer = new BufferedWriter(new FileWriter(fileName));
         writer.write(sBuilder.toString());
         writer.flush();
         writer.close();
+        logger.info("Exported data to file " + fileName);
     }
 
     private static void processUserInput(){
@@ -134,8 +144,6 @@ public class Main {
             mutationRate      = getValue("--pm");
             recombinationRate = getValue("--pc");
             protect = getStringValue("--protect").equals("best");
-
-            statArr = new int [runsNum];
         }
     }
 
@@ -158,7 +166,7 @@ public class Main {
         return val;
     }
 
-    public static String getStringValue(String arg){
+    private static String getStringValue(String arg){
         Optional<String> geneLenStringOptional = Arrays.stream(arguments).filter(elem -> elem.contains(arg)).findFirst();
         String geneLenString = "";
 
@@ -169,13 +177,19 @@ public class Main {
         String val = geneLenString.substring(pos).trim();
 
         if(val.equals("")){
+            logger.error("Incorrect protect option input");
             printError("protect option can not be empty!");
         }
 
         return val.trim();
     }
 
+    /**
+     * Prints error out logs it and terminates program
+     * @param err
+     */
     public static void printError(String err){
+        logger.error(err);
         System.out.println("Error: " + err);
         System.exit(99);
     }
