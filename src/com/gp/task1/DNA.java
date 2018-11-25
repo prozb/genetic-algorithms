@@ -51,7 +51,6 @@ public class DNA {
             if(setCell(randPos))
                 initCount--;
         }
-
         calcFitness();
     }
 

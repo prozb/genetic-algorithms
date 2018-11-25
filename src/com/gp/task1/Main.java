@@ -24,17 +24,18 @@ public class Main {
     private static int maxGenerations;
     private static int initRate;
     private static int runsNum;
+    private static int pointsPos;
+    private static long startTime;
     private static float mutationRate;
     private static float recombinationRate;
+    private static float lastPc;
     private static boolean protect;
 
-    private static StringBuilder sBuilder;
-    private static BufferedWriter writer;
-    private static String [] arguments;
     private static Point [] points;
-    private static int pointsPos;
+    private static String [] arguments;
+    private static BufferedWriter writer;
+    private static StringBuilder sBuilder;
 
-    private static long startTime;
     private static Date date;
     private static SimpleDateFormat sdfDate;
     private static SimpleDateFormat sdfFile;
@@ -69,7 +70,8 @@ public class Main {
         //creating simulations to be executed by thread pool
         for (int i = 0; i < permNumber; i++) {
             Callable<String> simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate,
-                    runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, points[i], Constants.GRAPH_SIMULATION);
+                    runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, points[i],
+                    Constants.GRAPH_SIMULATION, i);
             simulations.add(simulation);
         }
 
@@ -83,16 +85,26 @@ public class Main {
                     }
                 })
                 .forEach(Main::pushIntoBuilder);
-
         executors.shutdown();
+
         logger.info("Finished " + Simulation.counter + " simulations");
         exportBufferToFile();
-        logger.info("Time: complete program duration = " + TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - startTime) + "s");
+        logger.info("Time: complete program duration " + TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - startTime) + "s");
         logger.info("Program execution finished at " + sdfDate.format(new Date()));
     }
 
     //pushing string into builder after simulation completed
     private static void pushIntoBuilder(String s){
+        String [] strings = s.trim().replaceAll("\t+", ",").split(",");
+        if(strings.length > 0){
+            if(lastPc == 0){
+                lastPc = Float.parseFloat(strings[0]);
+            }
+            if(lastPc < Float.parseFloat(strings[0])){
+                sBuilder.append("\n");
+                lastPc = Float.parseFloat(strings[0]);
+            }
+        }
         sBuilder.append(s);
     }
 

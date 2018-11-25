@@ -11,19 +11,21 @@ import java.util.concurrent.Callable;
  */
 
 public class Simulation implements Callable<String>{
-    public int simulationsCount;
-    public static int counter;
+    public static int counter;      //static simulations counter
+
     private int generationCount;
     private int geneLen;
     private int replicationSchema;
     private int crossOverSchema;
-    private int maxGenerations;
+    private int maxGenerations;     //max generations of one simulation
     private int initRate;
-    private int runsNum;
+    private int runsNum;            //runs to calculate average
+    private int posSimul;
     private float mutationRate;
     private float recombinationRate;
-    private boolean protect;
-    private boolean isGraph;
+    private float lastPc;
+    private boolean protect;        //protect best schema
+    private boolean isGraph;        //if need to export to file
 
     private int [] statArr;
     private int resPosition;
@@ -34,9 +36,9 @@ public class Simulation implements Callable<String>{
         counter = 0;
     }
 
-    public Simulation(int geneLen, int generationCount, float mutationRate, float recombinationRate, int runsNum,
-                      int replicationSchema, int crossOverSchema, int maxGenerations, int initRate, boolean protect,
-                      Point point, boolean isGraph){
+    Simulation(int geneLen, int generationCount, float mutationRate, float recombinationRate, int runsNum,
+               int replicationSchema, int crossOverSchema, int maxGenerations, int initRate, boolean protect,
+               Point point, boolean isGraph, int pos){
 
         this.generationCount   = generationCount;
         this.recombinationRate = recombinationRate;
@@ -45,6 +47,7 @@ public class Simulation implements Callable<String>{
         this.maxGenerations    = maxGenerations;
         this.mutationRate      = mutationRate;
 
+        this.posSimul = pos;
         this.point    = point;
         this.isGraph  = isGraph;
         this.runsNum  = runsNum;
@@ -53,8 +56,10 @@ public class Simulation implements Callable<String>{
         this.geneLen  = geneLen;
         this.statArr  = new int[runsNum];
         this.sb       = new StringBuilder();
+
+        counter++;
     }
-    // TESTING PARAMETERS: --pm=0.02 --pc=0.5 --genecount=200 --genelen=200 --maxgen=1000 --runs=10 --protect=best --initrate=5 --crossover_scheme=1 --replication_scheme=1
+
     public String call() {
         try {
             if(isGraph)
@@ -66,7 +71,7 @@ public class Simulation implements Callable<String>{
         }catch (Exception e){
             Main.printError("Cannot execute simulation " + e.toString());
         }
-        Main.logger.info("Thread #" + counter + " finished");
+        Main.logger.info("Thread #" + Thread.currentThread().getId() + " finished");
 
         return sb.toString();
     }
@@ -84,17 +89,21 @@ public class Simulation implements Callable<String>{
 
         genCount = calcStatistics();
         exportToBuffer(mutationRate, recombinationRate, genCount);
-        counter++;
-        Main.logger.debug("===> Thread $" + Thread.currentThread().getId() + " simulation #" + counter + " finished");
+        Main.logger.debug("===> Thread $" + Thread.currentThread().getId() + " simulation #" + posSimul + " finished");
 
-        sb.append("\n");
+//        sb.append("\n");
     }
 
     private void exportToBuffer(float pc, float pm, float averCount){
+        if(lastPc != 0 && lastPc != pc) {
+            lastPc = pc;
+            sb.append("\n");
+        }
+
         sb.append(pm);
-        sb.append("\t");
+        sb.append("\t\t");
         sb.append(pc);
-        sb.append("\t");
+        sb.append("\t\t");
         sb.append(averCount);
         sb.append("\t\n");
     }
@@ -105,7 +114,7 @@ public class Simulation implements Callable<String>{
         int runsCounter  = 0;
         while (localRunsNum > 0){
             runSimulation();
-            Main.logger.debug("Thread $" + Thread.currentThread().getId()  + " simulation #" + counter +
+            Main.logger.debug("Thread $" + Thread.currentThread().getId()  + " simulation #" + posSimul +
                               " run #" + runsCounter + " finished");
             localRunsNum--;
             runsCounter++;
