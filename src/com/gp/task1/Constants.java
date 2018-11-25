@@ -23,4 +23,6 @@ public class Constants {
 
     public static final String DATE_PATTERN      = "yyyy.MM.dd hh:hh:ss";
     public static final String DATE_FILE_PATTERN = "yyyy_MM_dd_hh_mm_ss";
+
+    public static final boolean GRAPH_SIMULATION = false;
 }

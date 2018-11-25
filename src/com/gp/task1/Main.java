@@ -39,7 +39,7 @@ public class Main {
     private static SimpleDateFormat sdfDate;
     private static SimpleDateFormat sdfFile;
 
-    private static final Logger logger = Logger.getLogger(Main.class);
+    public static final Logger logger = Logger.getLogger(Main.class);
 
     // TESTING PARAMETERS: --pm=0.02 --pc=0.5 --genecount=200 --genelen=200 --maxgen=1000 --runs=10 --protect=best --initrate=5 --crossover_scheme=1 --replication_scheme=1
     public static void main(String[] args) throws InterruptedException, IOException {
@@ -69,7 +69,7 @@ public class Main {
         //creating simulations to be executed by thread pool
         for (int i = 0; i < permNumber; i++) {
             Callable<String> simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate,
-                    runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, points[i]);
+                    runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, points[i], Constants.GRAPH_SIMULATION);
             simulations.add(simulation);
         }
 
@@ -111,13 +111,15 @@ public class Main {
 
     //exporting string builder to file
     private static void exportBufferToFile() throws IOException {
-        String fileName = "plot" +  sdfFile.format(date) + ".txt";
-        logger.info("Creating file " + fileName);
-        writer = new BufferedWriter(new FileWriter(fileName));
-        writer.write(sBuilder.toString());
-        writer.flush();
-        writer.close();
-        logger.info("Exported data to file " + fileName);
+        if(Constants.GRAPH_SIMULATION) {
+            String fileName = "plot" + sdfFile.format(date) + ".txt";
+            logger.info("Creating file " + fileName);
+            writer = new BufferedWriter(new FileWriter(fileName));
+            writer.write(sBuilder.toString());
+            writer.flush();
+            writer.close();
+            logger.info("Exported data to file " + fileName);
+        }
     }
 
     private static void processUserInput(){

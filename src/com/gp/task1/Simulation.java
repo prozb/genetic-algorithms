@@ -23,13 +23,12 @@ public class Simulation implements Callable<String>{
     private float mutationRate;
     private float recombinationRate;
     private boolean protect;
+    private boolean isGraph;
 
     private int [] statArr;
     private int resPosition;
     private StringBuilder sb;
     private Point point;
-
-    private volatile boolean ready;
 
     static {
         counter = 0;
@@ -37,7 +36,7 @@ public class Simulation implements Callable<String>{
 
     public Simulation(int geneLen, int generationCount, float mutationRate, float recombinationRate, int runsNum,
                       int replicationSchema, int crossOverSchema, int maxGenerations, int initRate, boolean protect,
-                      Point point){
+                      Point point, boolean isGraph){
 
         this.generationCount   = generationCount;
         this.recombinationRate = recombinationRate;
@@ -46,7 +45,8 @@ public class Simulation implements Callable<String>{
         this.maxGenerations    = maxGenerations;
         this.mutationRate      = mutationRate;
 
-        this.point   = point;
+        this.point    = point;
+        this.isGraph  = isGraph;
         this.runsNum  = runsNum;
         this.initRate = initRate;
         this.protect  = protect;
@@ -57,25 +57,26 @@ public class Simulation implements Callable<String>{
     // TESTING PARAMETERS: --pm=0.02 --pc=0.5 --genecount=200 --genelen=200 --maxgen=1000 --runs=10 --protect=best --initrate=5 --crossover_scheme=1 --replication_scheme=1
     public String call() {
         try {
-//        startSimulation();
-            graphSimulation();
-//            printStatistics();
-//            exportBufferToFile();
+            if(isGraph)
+                graphSimulation();
+            else {
+                startSimulation();
+                printStatistics();
+            }
         }catch (Exception e){
             Main.printError("Cannot execute simulation " + e.toString());
         }
-        System.err.println("Thread #" + counter + " finished");
+        Main.logger.info("Thread #" + counter + " finished");
 
         return sb.toString();
     }
 
 
-    private void graphSimulation() throws InterruptedException, IOException {
+    private void graphSimulation(){
         sb.setLength(0);
-
+        //average generations count to achieve max fitness
         float genCount = 0;
 
-        //System.err.println("===> Thread $" + simulationNum + " simulation #" + counter + " started");
         mutationRate      = point.getPm();
         recombinationRate = point.getPc();
 
@@ -84,10 +85,9 @@ public class Simulation implements Callable<String>{
         genCount = calcStatistics();
         exportToBuffer(mutationRate, recombinationRate, genCount);
         counter++;
-        System.err.println("===> Thread $" + Thread.currentThread().getId() + " simulation #" + counter + " finished");
+        Main.logger.debug("===> Thread $" + Thread.currentThread().getId() + " simulation #" + counter + " finished");
 
         sb.append("\n");
-        System.err.println("===> Thread $" + Thread.currentThread().getId()  + " | " + simulationsCount +  " simulations finished");
     }
 
     private void exportToBuffer(float pc, float pm, float averCount){
@@ -99,18 +99,20 @@ public class Simulation implements Callable<String>{
         sb.append("\t\n");
     }
 
-    private void startSimulation() throws InterruptedException {
+    //process runsNum simulations to calculate average
+    private void startSimulation() {
         int localRunsNum = runsNum;
         int runsCounter  = 0;
         while (localRunsNum > 0){
-//            System.err.println("Thread $" +  Thread.currentThread().getId() +  " run #" + runsCounter + " started");
             runSimulation();
-            System.err.println("Thread $" + Thread.currentThread().getId()  +  " run #" + runsCounter + " finished");
+            Main.logger.debug("Thread $" + Thread.currentThread().getId()  + " simulation #" + counter +
+                              " run #" + runsCounter + " finished");
             localRunsNum--;
             runsCounter++;
         }
     }
 
+    //process just one simulation
     private void runSimulation() {
         int runsCount = maxGenerations;
 
@@ -124,7 +126,6 @@ public class Simulation implements Callable<String>{
             pool.switchToNextGeneration();
             runsCount--;
         }
-//        pool.printInfo();
         push(pool.getGenerationsCount() - 1);
     }
 
@@ -135,8 +136,7 @@ public class Simulation implements Callable<String>{
     }
 
     public void printStatistics(){
-        System.out.printf("\n" + new String(new char[100]).replace("\0", "=")+ "\n" +
-                "\nto achieve complete fitness, you need average %.4f generations", calcStatistics());
+        Main.logger.info("Average " + calcStatistics() % 1000 + " generations to achieve max fitness");
     }
 
     // pushes result of the generation into statistics array
