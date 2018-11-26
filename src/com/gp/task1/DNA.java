@@ -15,8 +15,8 @@ public class DNA {
 
     // fitness will be calculated after creating gene
     public DNA(int len, int initRate){
-        this.len = len;
-
+        this.len     = len;
+        this.fitness = 0;
         initGene(initRate);
         calcFitness();
     }

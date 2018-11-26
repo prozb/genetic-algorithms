@@ -54,7 +54,7 @@ public class DNAPoolTest {
         DNA DNA1 = new DNA(len, init);
         DNA DNA2 = new DNA(len, init);
 
-        DNA newDNA = pool.crossOver(DNA1, DNA2, pos);
+        DNA newDNA = pool.crossOverOne(DNA1, DNA2, pos);
 
         Integer [] gene  = newDNA.getGene();
         Integer [] part1 = Arrays.copyOfRange(DNA1.getGene(), 0, pos);

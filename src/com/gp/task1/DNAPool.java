@@ -84,19 +84,13 @@ public class DNAPool {
     // created for testing reasons
     public void processCrossOver(){
         setBestGene();
-        switch(crossOverSchema){
-            case 1:
-                crossOverSchemaOne();
-                break;
-            default:
-                throw new RuntimeException("please input replication schema");
-        }
+        crossOverSchema();
         unsetBestGene();
         calcMinFitnessOfGeneration();
         calcMaxFitnessOfGeneration();
     }
 
-    public void crossOverSchemaOne(){
+    public void crossOverSchema(){
         int crossOverCount = (int) (recombinationRate * generationLen);
         int crossOverPerf  = 0;
         int firstGenePos   = 0;
@@ -112,11 +106,29 @@ public class DNAPool {
             if(!(firstGenePos == bestPos || secondGenePos == bestPos)){
                 randPos = (int) (Math.random() * geneLen);
 
-                DNA DNA1 = crossOver(currentGeneration[firstGenePos], currentGeneration[secondGenePos], randPos);
-                DNA DNA2 = crossOver(currentGeneration[secondGenePos], currentGeneration[firstGenePos], randPos);
+                DNA dna1 = new DNA(geneLen);
+                DNA dna2 = new DNA(geneLen);
 
-                currentGeneration[firstGenePos] = DNA1;
-                currentGeneration[secondGenePos] = DNA2;
+                switch (crossOverSchema){
+                    case 1: {
+                        dna1 = crossOverOne(currentGeneration[firstGenePos], currentGeneration[secondGenePos], randPos);
+                        dna2 = crossOverOne(currentGeneration[secondGenePos], currentGeneration[firstGenePos], randPos);
+                    }break;
+
+                    case 2: {
+                        int randPos1 = randPosCrossOverTwo(randPos);
+                        dna1 = crossOverTwo(currentGeneration[firstGenePos], currentGeneration[secondGenePos], randPos, randPos1, true);
+                        dna2 = crossOverTwo(currentGeneration[firstGenePos], currentGeneration[secondGenePos], randPos, randPos1, false);
+                    }break;
+
+                    default: {
+                        Main.logger.error("Chose cross over schema");
+                        Main.printError("Chose cross over schema");
+                    }
+                }
+
+                currentGeneration[firstGenePos] = dna1;
+                currentGeneration[secondGenePos] = dna2;
 
                 crossOverCount--;
                 crossOverPerf++;
@@ -126,7 +138,49 @@ public class DNAPool {
         assert (int)(currentGeneration.length * recombinationRate) == crossOverPerf;
     }
 
-    public DNA crossOver(DNA DNA1, DNA DNA2, int randPos){
+    private int randPosCrossOverTwo(int pos){
+        int pos1 = 0;
+
+        do{
+            pos1 = (int)(Math.random() * geneLen);
+        }while (!(Math.abs(pos1 - pos) > geneLen / Constants.GENES_SCALE && Math.abs(pos1 - pos) < Constants.GENES_SCALE / 2));
+
+        return pos1;
+    }
+
+    private DNA crossOverTwo(DNA DNA1, DNA DNA2, int randPos1, int randPos2, boolean first){
+        int pos2 = randPos1 > randPos2 ? randPos1 : randPos2;
+        int pos1 = randPos1 > randPos2 ? randPos2 : randPos1;
+
+        DNA newDNA = new DNA(DNA1.getGene().length);
+        Integer [] test1   = new Integer[Math.abs(pos1 - pos2)];
+        Integer [] test2   = new Integer[Math.abs(pos1 - pos2)];
+        System.arraycopy(DNA1.getGene(), pos1, test1, 0, Math.abs(pos1 - pos2));
+        System.arraycopy(DNA2.getGene(), pos1, test2, 0, Math.abs(pos1 - pos2));
+
+        int test1Fitness = (int) Arrays.stream(test1).filter(elem -> elem == 1).count();
+        int test2Fitness = (int) Arrays.stream(test2).filter(elem -> elem == 1).count();
+
+        test1 = test1Fitness > test2Fitness ? test1 : test2;
+
+        if(first) {
+            Integer[] testGene1 = new Integer[geneLen];
+            System.arraycopy(DNA1.getGene(), 0, testGene1, 0, pos1);
+            System.arraycopy(test1, 0, testGene1, pos1, test1.length);
+            System.arraycopy(DNA1.getGene(), pos2, testGene1, pos2, geneLen - pos2);
+
+            newDNA.setGene(testGene1);
+        }else {
+            Integer[] testGene2 = new Integer[geneLen];
+            System.arraycopy(DNA2.getGene(), 0, testGene2, 0, pos1);
+            System.arraycopy(test1, 0, testGene2, pos1, test1.length);
+            System.arraycopy(DNA2.getGene(), pos2, testGene2, pos2, geneLen - pos2);
+
+            newDNA.setGene(testGene2);
+        }
+        return newDNA;
+    }
+    public DNA crossOverOne(DNA DNA1, DNA DNA2, int randPos){
         DNA newDNA = new DNA(DNA1.getGene().length);
         Integer [] newGene = new Integer[DNA1.getGene().length];
 
@@ -176,7 +230,6 @@ public class DNAPool {
     }
 
     public void processReplication(){
-//        sortGeneration();
         switch(replicationSchema){
             case 1:
                 replicationSchemaOne();
@@ -194,7 +247,6 @@ public class DNAPool {
 
     // rank based selection
     private void replicationSchemaTwo(){
-        //sortGeneration();
         processRanking();
         passRankedGenesIntoGeneration();
         clearRankings();
@@ -205,7 +257,6 @@ public class DNAPool {
     }
 
     private void processRanking(){
-//        printOutRankTable();////////TESTING REASONS
         currentGeneration[0].calcProbability(0, generationLen);
 
         for(int rank = 1; rank < currentGeneration.length; rank++){
@@ -213,7 +264,6 @@ public class DNAPool {
             double prev = currentGeneration[rank - 1].getPsCum();
             currentGeneration[rank].calcCumulProbability(prev);
         }
-//        printOutRankTable();/////////TESTING REASONS
     }
 
     private void passRankedGenesIntoGeneration(){
@@ -226,24 +276,16 @@ public class DNAPool {
         this.currentGeneration = newGeneration;
     }
 
-    //TODO: How to test this method?????
-    //TODO: need refactoring?
     private DNA getBestRankedDNA(){
         double probability = Math.random();
 
         for(int i = 1; i < currentGeneration.length; i++){
             if(probability == currentGeneration[i - 1].getPsCum()){
-//                System.out.println("prob: " + probability + "chosen DNA is Nr." + (i - 1) + " fitness = " + currentGeneration[i - 1].getFitness() +
-//                " psCum = " + currentGeneration[i - 1].getPsCum());
                 return currentGeneration[i - 1];
             }else if(probability <= currentGeneration[i].getPsCum() && probability > currentGeneration[i - 1].getPsCum()){
-//                System.out.println("prob: " + probability +  "chosen DNA is Nr." + (i) + " fitness = " + currentGeneration[i].getFitness() +
-//                        " psCum = " + currentGeneration[i].getPsCum());
                 return currentGeneration[i];
             }
         }
-//        System.out.println("prob: " + probability + "chosen DNA is Nr." + (currentGeneration.length - 1) + " fitness = " + currentGeneration[currentGeneration.length - 1].getFitness() +
-//                " psCum = " + currentGeneration[currentGeneration.length - 1].getPsCum());
         return currentGeneration[currentGeneration.length - 1];
     }
 

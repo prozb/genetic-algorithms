@@ -18,6 +18,7 @@ public class Constants {
     public final static float PM_STEP    = 0.002f;
     public final static int SCALE_FACTOR = 1000000;
     public static final int NUM_OF_ARGS  = 10;
+    public static final int GENES_SCALE  = 40;
     public static final int THREADS_NUM  = 4;      //how much threads will be execute calculation (best way is when
                                                    //threads num equals count of physical CPUs)
 
