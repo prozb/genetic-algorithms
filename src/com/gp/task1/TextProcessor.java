@@ -4,34 +4,56 @@ import java.io.*;
 import java.util.Arrays;
 
 public class TextProcessor {
-    public static void main(String[] args) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader("plot.txt"));
+    private static float pc;
+    private static float pm;
+    private static float gens;
+    private static boolean firstRun;
 
-        StringBuilder sb = new StringBuilder();
+    public static void main(String[] args) throws IOException {
+        firstRun = true;
+
+        BufferedReader reader = new BufferedReader(new FileReader("/Users/p.rozbytskyi/Desktop/GP_Abgabe/scheme_1_protect_none.txt"));
 
         String read = reader.readLine();
         while (read != null){
-            String s = processLine(read);
-            s = changeFirstTwoCols(s);
-            s = s.replace(",", "\t\t");
-            System.out.println(s);
+//            s = changeFirstTwoCols(s);
+//            s = s.replace(",", "\t\t");
+//            System.out.println(s);
 
-            sb.append(s);
-            sb.append("\n");
-
+//            sb.append(s);
+//            sb.append("\n");
+            if(!read.equals("")) {
+                findBestPmPc(read);
+            }
             read = reader.readLine();
         }
 
-        System.out.println(sb.toString());
-
         reader.close();
+        System.out.println("Best pc = " + pc + " pm = " + pm + " gens = " + gens);
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter("plot1.txt"));
-        writer.write(sb.toString());
-        writer.flush();
-        writer.close();
+//        BufferedWriter writer = new BufferedWriter(new FileWriter("plot1.txt"));
+//        writer.write(sb.toString());
+//        writer.flush();
+//        writer.close();
     }
 
+    public static void findBestPmPc(String s){
+        String [] sArr = s.replaceAll("\t+", ",").split(",");
+        if(firstRun && sArr.length > 0){
+            pc = Float.parseFloat(sArr[0]);
+            pm = Float.parseFloat(sArr[1]);
+            gens = Float.parseFloat(sArr[2]);
+            firstRun = false;
+        }else if(sArr.length > 0){
+            float relGen = Float.parseFloat(sArr[2]);
+
+            if(relGen < gens){
+                gens = relGen;
+                pc = Float.parseFloat(sArr[0]);
+                pm = Float.parseFloat(sArr[1]);
+            }
+        }
+    }
     public static String changeFirstTwoCols(String s){
         String[] sArr = s.split(" ");
         if(!(sArr.length <= 1)) {

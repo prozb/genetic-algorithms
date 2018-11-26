@@ -4,11 +4,7 @@ import com.gp.task1.Constants;
 import com.gp.task1.DNA;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.util.Arrays;
-
-import static org.hamcrest.CoreMatchers.is;
-
 /**
  * @author Pavlo Rozbytskyi
  * @version 2.0.1
