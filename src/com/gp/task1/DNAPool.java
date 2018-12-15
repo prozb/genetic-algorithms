@@ -361,10 +361,4 @@ public class DNAPool {
             bestGene.ifPresent(DNA::unsetBest);
         }
     }
-
-    //TODO: print out rank based selection table for debugging reasons
-    public void printOutRankTable(){
-        Arrays.stream(currentGeneration).forEach(DNA::printRank);
-    }
-
 }
