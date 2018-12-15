@@ -62,12 +62,12 @@ public class Simulation implements Callable<String>{
 
     public String call() {
         try {
-            if(isGraph)
+//            if(isGraph)
                 graphSimulation();
-            else {
-                startSimulation();
-                printStatistics();
-            }
+//            else {
+//                startSimulation();
+//                printStatistics();
+//            }
         }catch (Exception e){
             Main.printError("Cannot execute simulation " + e.toString());
         }

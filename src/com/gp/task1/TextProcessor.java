@@ -12,7 +12,7 @@ public class TextProcessor {
     public static void main(String[] args) throws IOException {
         firstRun = true;
 
-        BufferedReader reader = new BufferedReader(new FileReader("/Users/p.rozbytskyi/Desktop/GP_Abgabe/scheme_1_protect_none.txt"));
+        BufferedReader reader = new BufferedReader(new FileReader("/Users/p.rozbytskyi/Desktop/GP_Abgabe/schema_2_protect_none.txt"));
 
         String read = reader.readLine();
         while (read != null){
@@ -29,7 +29,7 @@ public class TextProcessor {
         }
 
         reader.close();
-        System.out.println("Best pc = " + pc + " pm = " + pm + " gens = " + gens);
+        System.out.printf("Best pc = %.3f pm = %.3f gens = %.3f", pc, pm, gens);
 
 //        BufferedWriter writer = new BufferedWriter(new FileWriter("plot1.txt"));
 //        writer.write(sb.toString());

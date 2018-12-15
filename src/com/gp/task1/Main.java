@@ -68,10 +68,17 @@ public class Main {
         logger.info("Creating " + Constants.THREADS_NUM + " threads");
 
         //creating simulations to be executed by thread pool
-        for (int i = 0; i < permNumber; i++) {
+        if(Constants.GRAPH_SIMULATION) {
+            for (int i = 0; i < permNumber; i++) {
+                Callable<String> simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate,
+                        runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, points[i],
+                        Constants.GRAPH_SIMULATION, i);
+                simulations.add(simulation);
+            }
+        }else{
             Callable<String> simulation = new Simulation(geneLen, generationCount, mutationRate, recombinationRate,
-                    runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, points[i],
-                    Constants.GRAPH_SIMULATION, i);
+                    runsNum, replicationSchema, crossOverSchema, maxGenerations, initRate, protect, new Point(recombinationRate, mutationRate),
+                    Constants.GRAPH_SIMULATION, 0);
             simulations.add(simulation);
         }
 
@@ -88,23 +95,31 @@ public class Main {
         executors.shutdown();
 
         logger.info("Finished " + Simulation.counter + " simulations");
-        exportBufferToFile();
+        if(Constants.GRAPH_SIMULATION) {
+            exportBufferToFile();
+        }else{
+            exportBufferToFile();
+            logger.info("Average " + sBuilder.toString() + " generations to achieve max fitness");
+        }
         logger.info("Time: complete program duration " + TimeUnit.NANOSECONDS.toSeconds(System.nanoTime() - startTime) + "s");
         logger.info("Program execution finished at " + sdfDate.format(new Date()));
     }
 
     //pushing string into builder after simulation completed
     private static void pushIntoBuilder(String s){
-        String [] strings = s.trim().replaceAll("\t+", ",").split(",");
-        if(strings.length > 0){
-            if(lastPc == 0){
-                lastPc = Float.parseFloat(strings[0]);
-            }
-            if(lastPc < Float.parseFloat(strings[0])){
-                sBuilder.append("\n");
-                lastPc = Float.parseFloat(strings[0]);
+        if(Constants.GRAPH_SIMULATION) {
+            String[] strings = s.trim().replaceAll("\t+", ",").split(",");
+            if (strings.length > 0) {
+                if (lastPc == 0) {
+                    lastPc = Float.parseFloat(strings[0]);
+                }
+                if (lastPc < Float.parseFloat(strings[0])) {
+                    sBuilder.append("\n");
+                    lastPc = Float.parseFloat(strings[0]);
+                }
             }
         }
+
         sBuilder.append(s);
     }
 
@@ -123,7 +138,6 @@ public class Main {
 
     //exporting string builder to file
     private static void exportBufferToFile() throws IOException {
-        if(Constants.GRAPH_SIMULATION) {
             String fileName = "plot" + sdfFile.format(date) + ".txt";
             logger.info("Creating file " + fileName);
             writer = new BufferedWriter(new FileWriter(fileName));
@@ -131,7 +145,6 @@ public class Main {
             writer.flush();
             writer.close();
             logger.info("Exported data to file " + fileName);
-        }
     }
 
     private static void processUserInput(){
